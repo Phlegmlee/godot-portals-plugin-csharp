@@ -112,6 +112,9 @@ public partial class Portal3D : Node3D
 		return GetWorld3D().DirectSpaceState.IntersectRay(query);
 	}
 
+	//const StringName OnTeleportCallback = &"OnTeleport";
+	// TODO: const callbacks
+
 	#endregion
 
 	private Vector2 _portalSize = new(2.0f, 2.5f);
@@ -146,7 +149,12 @@ public partial class Portal3D : Node3D
 
 	public Camera3D PlayerCamera;
 
-	public float PortalFrameWidth = 0.0f;
+	private float _portalFrameWidth = 0.0f;
+	public float PortalFrameWidth
+	{
+		get => _portalFrameWidth;
+		set => _portalFrameWidth = value;
+	}
 
 	public enum PortalViewportSizeMode
 	{
@@ -195,7 +203,74 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	// TODO: CONTINUE HERE with is_teleport on line 239
+	private bool _isTeleport = true;
+	public bool IsTeleport
+	{
+		get => _isTeleport;
+		set
+		{
+			_isTeleport = value;
+			if (CausedByUserInteraction())
+			{
+				SetupTeleport();
+				NotifyPropertyListChanged();
+			}
+		}
+	}
+
+	public enum PortalTeleportDirection
+	{
+		Front,
+		Back,
+		FrontAndBack
+	}
+	private PortalTeleportDirection _teleportDirection = PortalTeleportDirection.FrontAndBack;
+	public PortalTeleportDirection TeleportDirection
+	{
+		get => _teleportDirection;
+		set => _teleportDirection = value;
+	}
+
+	private float _rigidbodyBoost = 0.0f;
+	public float RigidbodyBoost
+	{
+		get => _rigidbodyBoost;
+		set => _rigidbodyBoost = value;
+	}
+
+	private float _teleportTolerance = 0.5f;
+	public float TeleportTolerance
+	{
+		get => _teleportTolerance;
+		set => _teleportTolerance = value;
+	}
+
+	public enum PortalTeleportInteractions
+	{
+		Callback = 1 << 0,
+		PlayerUpright = 1 << 1,
+		DuplicateMeshes = 1 << 2
+	}
+	private int _teleportInteractions = (int)PortalTeleportInteractions.Callback | (int)PortalTeleportInteractions.PlayerUpright;
+	public int TeleportInteractions
+	{
+		get => _teleportInteractions;
+		set => _teleportInteractions = value;
+	}
+
+	private int _teleportCollisionMask = 1 << 15;
+	public int TeleportCollisionMask
+	{
+		get => _teleportCollisionMask;
+		set => _teleportCollisionMask = value;
+	}
+
+	private bool _startDeactivated = false;
+	public bool StartDeactivated
+	{
+		get => _startDeactivated;
+		set => _startDeactivated = value;
+	}
 
 	#region Internal
 
