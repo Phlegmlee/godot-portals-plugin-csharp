@@ -1,9 +1,9 @@
 #if TOOLS
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 using Godot.Collections;
-namespace Portal3D;
+namespace Portals3D;
 
 /*
 	Seamless 3D portal
@@ -117,6 +117,8 @@ public partial class Portal3D : Node3D
 
 	#endregion
 
+	#region Options Members
+
 	private Vector2 _portalSize = new(2.0f, 2.5f);
 	public Vector2 PortalSize
 	{
@@ -130,7 +132,7 @@ public partial class Portal3D : Node3D
 				UpdateConfigurationWarnings();
 				ExitPortal?.UpdateConfigurationWarnings();
 			}
-		} 
+		}
 	}
 
 	private Portal3D _exitPortal = null;
@@ -272,7 +274,174 @@ public partial class Portal3D : Node3D
 		set => _startDeactivated = value;
 	}
 
+	#endregion
+
 	#region Internal
+
+	//FIXME: These first 4 members are @export_storage in gdscript, this is what I chose to do for the rewrite.
+	private float _portalThickness = 0.05f;
+	internal float PortalThickness
+	{
+		get => _portalThickness;
+		set
+		{
+			_portalThickness = value;
+			if (CausedByUserInteraction()) OnPortalSizeChanged();
+		}
+	}
+
+	private NodePath _portalMeshPath;
+	internal NodePath PortalMeshPath
+	{
+		get => _portalMeshPath;
+		set => _portalMeshPath = value;
+	}
+	internal MeshInstance3D PortalMesh
+	{
+		get
+		{
+			return PortalMeshPath != null ? GetNode<MeshInstance3D>(PortalMeshPath) : null;
+		}
+		set
+		{
+			Debug.Assert(false, "Proxy variable, use 'PortalMeshPath' instead.");
+		}
+	}
+
+	private NodePath _teleportAreaPath;
+	internal NodePath TeleportAreaPath
+	{
+		get => _teleportAreaPath;
+		set => _teleportAreaPath = value;
+	}
+	internal Area3D TeleportArea
+	{
+		get
+		{
+			return TeleportAreaPath != null ? GetNode<Area3D>(TeleportAreaPath) : null;
+		}
+		set
+		{
+			Debug.Assert(false, "Proxy variable, use 'TeleportAreaPath' instead.");
+		}
+	}
+
+	private NodePath _teleportColliderPath;
+	internal NodePath TeleportColliderPath
+	{
+		get => _teleportColliderPath;
+		set => _teleportColliderPath = value;
+	}
+	internal CollisionShape3D TeleportCollider
+	{
+		get
+		{
+			return TeleportColliderPath != null ? GetNode<CollisionShape3D>(TeleportColliderPath) : null;
+		}
+		set
+		{
+			Debug.Assert(false, "Proxy variable, use 'TeleportColliderPath' instead.");
+		}
+	}
+
+	internal Camera3D PortalCamera = null;
+
+	internal SubViewport PortalViewport = null;
+
+	internal partial class TeleportableMetaData : GodotObject
+	{
+		public float Forward = 0.0f;
+		public bool IsPlayer = false;
+		public Array<MeshInstance3D> Meshes = [];
+		public Array<MeshInstance3D> MeshClones = [];
+	}
+
+	internal Dictionary<int, TeleportableMetaData> WatchlistTeleportables = [];
+
+	#endregion
+
+	#region Editor Configuration
+
+	// TODO: Portal shader here
+	// TODO: Editor preview material here
+
+	private void _EditorReady()
+	{
+		//AddToGroup()
+		SetNotifyTransform(true);
+
+		ProcessPriority = 100;
+		ProcessPhysicsPriority = 100;
+
+		SetupMesh();
+		SetupTeleport();
+
+		this.GroupNode(this);
+	}
+
+	// Method Notification
+
+	// Method EditorPairPortals
+
+	// Method EditorSyncPortalSizes
+
+	private void SetupTeleport()
+	{
+		if (!IsTeleport)
+		{
+			if (TeleportArea != null)
+			{
+				TeleportArea.QueueFree();
+				TeleportAreaPath = new NodePath("");
+			}
+			if (TeleportCollider != null)
+			{
+				TeleportCollider.QueueFree();
+				TeleportColliderPath = new NodePath("");
+			}
+			return;
+		}
+
+		if (TeleportArea != null && TeleportCollider != null) return;
+
+		Area3D area = new() { Name = "TeleportArea" };
+
+		// TODO: Method AddChildInEditor
+
+		TeleportAreaPath = GetPathTo(area);
+
+		CollisionShape3D collider = new() { Name = "TeleportCollider" };
+		BoxShape3D box = new();
+		box.Size = box.Size with { X = PortalSize.X, Y = PortalSize.Y };
+		collider.Shape = box;
+
+		// TODO: Method AddChildInEditor
+		TeleportColliderPath = GetPathTo(collider);
+	}
+
+	private void OnPortalSizeChanged()
+	{
+		if (PortalMesh == null) return;
+
+		// TODO: Implement PortalBoxMesh 
+		// Finish this method
+	}
+
+	#endregion
+
+	#region Gameplay Logic
+
+	#endregion
+
+	#region Event Handlers
+
+	#endregion
+
+	#region UTILS
+
+	#endregion
+
+	#region Godot Editor Integrations
 
 	#endregion
 }
