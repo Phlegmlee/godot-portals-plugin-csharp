@@ -4,12 +4,12 @@ namespace Portals3D;
 
 public partial class PortalSettings : GodotObject
 {
-	static string QualName(string setting)
+	internal static string QualName(string setting)
 	{
 		return "addons/portalsCS/" + setting;
 	}
 
-	static void InitSetting(string setting, Variant defaultValue, bool requiresRestart = false)
+	internal static void InitSetting(string setting, Variant defaultValue, bool requiresRestart = false)
 	{
 		setting = QualName(setting);
 
@@ -23,7 +23,7 @@ public partial class PortalSettings : GodotObject
 		ProjectSettings.SetAsBasic(setting, true);
 	}
 
-	static void AddInfo(Dictionary config)
+	internal static void AddInfo(Dictionary config)
 	{
 		string qualName = QualName((string)config["name"]);
 
@@ -34,7 +34,7 @@ public partial class PortalSettings : GodotObject
 		ProjectSettings.AddPropertyInfo(config);
 	}
 
-	static Variant GetSetting(string setting)
+	internal static Variant GetSetting(string setting)
 	{
 		setting = QualName(setting);
 		return ProjectSettings.GetSetting(setting);
