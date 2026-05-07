@@ -6,7 +6,7 @@ public partial class PortalSettings : GodotObject
 {
 	static string QualName(string setting)
 	{
-		return "addons/portals/" + setting;
+		return "addons/portalsCS/" + setting;
 	}
 
 	static void InitSetting(string setting, Variant defaultValue, bool requiresRestart = false)

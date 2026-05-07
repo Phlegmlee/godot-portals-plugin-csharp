@@ -1,5 +1,6 @@
 #if TOOLS
 using Godot;
+namespace Portals3D;
 
 [Tool]
 public partial class Plugin : EditorPlugin
