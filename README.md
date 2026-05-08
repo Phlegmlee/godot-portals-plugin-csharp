@@ -1,6 +1,6 @@
 # godot-portals-plugin-csharp
 
-![Static Badge](https://img.shields.io/badge/REWRITE_STATUS-IN_PROGRESS_7%25-red)
+![Static Badge](https://img.shields.io/badge/REWRITE_STATUS-IN_PROGRESS_10%25-red)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md)
 
 This is Portals3D by Vojtech Struhar but rewritten into C#.
