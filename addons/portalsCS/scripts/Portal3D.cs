@@ -1,6 +1,6 @@
 #if TOOLS
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Godot;
 using Godot.Collections;
 namespace Portals3D;
@@ -25,7 +25,7 @@ namespace Portals3D;
 	I recommend creating a scene with Portal3D as a root and re-using that.
 */
 
-[Tool]
+[Tool, GlobalClass]
 public partial class Portal3D : Node3D
 {
 	#region Public API
@@ -57,7 +57,7 @@ public partial class Portal3D : Node3D
 
 		if (destroyViewports)
 		{
-			if (PortalViewport)
+			if (PortalViewport != null)
 			{
 				PortalViewport.QueueFree();
 				PortalViewport = null;
@@ -94,8 +94,8 @@ public partial class Portal3D : Node3D
 		Vector3 end = ToExitPosition(parameters.To);
 		start = ExitPortal.LineIntersection(start, end);
 
-		Array excludes = [this.TeleportArea, ExitPortal.TeleportArea];
-		excludes.Append(parameters.Exclude);
+		Array<Rid> excludes = [this.TeleportArea.GetRid(), ExitPortal.TeleportArea.GetRid()];
+		excludes.AddRange(parameters.Exclude);
 
 		PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create
 		(
@@ -147,7 +147,9 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	// TODO: Pair Portal and Sync Portal Editor Buttons here
+	// FIXME these may need to be public???
+	internal Callable _TbPairPortals = Callable.From(() => EditorPairPortals());
+	internal Callable _TbSyncPortalSizes = Callable.From(() => EditorSyncPortalSizes());
 
 	public Camera3D PlayerCamera;
 
@@ -191,8 +193,8 @@ public partial class Portal3D : Node3D
 		set => _viewDirection = value;
 	}
 
-	private int _portalRenderLayer = 1 << 19;
-	public int PortalRenderLayer
+	private uint _portalRenderLayer = 1 << 19;
+	public uint PortalRenderLayer
 	{
 		get => _portalRenderLayer;
 		set
@@ -348,7 +350,7 @@ public partial class Portal3D : Node3D
 
 	internal SubViewport PortalViewport = null;
 
-	internal partial class TeleportableMetaData : GodotObject
+	internal partial class TeleportableMetadata : GodotObject
 	{
 		public float Forward = 0.0f;
 		public bool IsPlayer = false;
@@ -356,7 +358,7 @@ public partial class Portal3D : Node3D
 		public Array<MeshInstance3D> MeshClones = [];
 	}
 
-	internal Dictionary<int, TeleportableMetaData> WatchlistTeleportables = [];
+	internal Godot.Collections.Dictionary<int, TeleportableMetadata> WatchlistTeleportables = [];
 
 	#endregion
 
@@ -379,11 +381,28 @@ public partial class Portal3D : Node3D
 		this.GroupNode(this);
 	}
 
-	// Method Notification
+	private void Notification(long what)
+	{
+		switch (what)
+		{
+			case NotificationTransformChanged:
+				UpdateGizmos();
+				break;
 
-	// Method EditorPairPortals
+			default:
+				break;
+		}
+	}
 
-	// Method EditorSyncPortalSizes
+	private static void EditorPairPortals()
+	{
+		// TODO: Editor Pair Portals
+	}
+
+	private static void EditorSyncPortalSizes()
+	{
+		// TODO: Editor Sync Portal Size
+	}
 
 	private void SetupTeleport()
 	{
@@ -431,6 +450,16 @@ public partial class Portal3D : Node3D
 
 	#region Gameplay Logic
 
+	private void SetupMesh()
+	{
+		// TODO: Setup Mesh Method
+	}
+
+	private void SetupCameras()
+	{
+		// TODO: Setup Cameras Method
+	}
+
 	#endregion
 
 	#region Event Handlers
@@ -439,9 +468,155 @@ public partial class Portal3D : Node3D
 
 	#region UTILS
 
+	private void ContructTpMetadata(Node3D node)
+	{
+		// TODO: Construct TP Metadata
+	}
+
+	private void EraseTpMetadata(int nodeId)
+	{
+		// TODO: Erase TP Metadata
+	}
+
+	private void TransferTpMetadataToExit(Node3D body)
+	{
+		// TODO: Transfer TP Metadata
+	}
+
+	private void EnableMeshClipping(TeleportableMetadata metadata, Portal3D alongPortal)
+	{
+		// TODO: Enable Mesh Clipping
+	}
+
+	private void DisableMeshClipping(MeshInstance3D meshInstance)
+	{
+		// TODO: Disable mesh clipping
+	}
+
+	private Transform3D ToExitTransform(Transform3D gTransform)
+	{
+		// TODO: To Exit transform
+		return new Transform3D();
+	}
+
+	private Vector3 ToExitDirection(Vector3 real)
+	{
+		// TODO: To Exit Direction
+		return Vector3.Zero;
+	}
+
+	private Vector3 ToExitPosition(Vector3 gPos)
+	{
+		// TODO: To Exit Position method
+		return Vector3.Zero;
+	}
+
+	private float ForwardDistance(Node3D node)
+	{
+		// TODO: Forward distance
+		return 0.0f;
+	}
+
+	private void AddChildInEditor(Node parent, Node node)
+	{
+		// TODO: Add child in editor
+	}
+
+	private bool CausedByUserInteraction()
+	{
+		return Engine.IsEditorHint() && IsNodeReady();
+	}
+
+	private void GroupNode(Node node)
+	{
+		// TODO: Group Node
+	}
+
+	private Vector2I CalculateViewportSize()
+	{
+		// TODO: Calculate viewport size
+		return new Vector2I();
+	}
+
+	private bool CheckTpInteraction(int flag)
+	{
+		// TODO; Check tp interaction
+		return false;
+	}
+
+	private void SetPortalPairUpdateMode(SubViewport.UpdateMode mode)
+	{
+		// TODO: Set portal pair update mode
+	}
+
+	private Vector3 LineIntersection(Vector3 start, Vector3 end)
+	{
+		// TODO: Line intersection
+		return Vector3.Zero;
+	}
+
 	#endregion
 
 	#region Godot Editor Integrations
+
+	private string[] GetConfigurationWarnings()
+	{
+		List<string> warnings = [];
+
+		Vector3 globalScale = GlobalBasis.Scale;
+		if (globalScale.IsEqualApprox(Vector3.One))
+		{
+			warnings.Add
+			(
+				$"Portals should NOT be scaled. Global portal scale is {globalScale}, " +
+				$"but should be {Vector3.One}. Make sure the portal and any of the " +
+				"portals parents aren't scaled. "
+			);
+		}
+
+		if (ExitPortal == null)
+		{
+			warnings.Add("Exit portal is null. ");
+		}
+
+		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
+		{
+			warnings.Add
+			(
+				"Portal size should be the same as the exit portals size. " +
+				$"Portal size: {PortalSize} Shoulde be: {ExitPortal.PortalSize}"
+			);
+		}
+
+		return [.. warnings];
+	}
+
+	private Array<Dictionary> GetPortalPropertyList()
+	{
+		Array<Dictionary> config = [];
+
+		config.Add(AtExport.ExportVector2("PortalSize"));
+
+		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
+		{
+			config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
+		}
+
+		config.Add(AtExport.ExportNode("ExitPortal", "Portal3D"));
+
+		if (ExitPortal != null && ExitPortal.ExitPortal == null)
+		{
+			config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
+		}
+
+		config.Add(AtExport.ExportGroup("Rendering"));
+		config.Add(AtExport.ExportNode("PlayerCamera", "Camera3D"));
+		config.Add(AtExport.ExportFloatRange("PortalFrameWidth", 0.0f, 10.0f, 0.01f));
+
+		//config.Add(AtExport.ExportEnum())
+
+		return config;
+	}
 
 	#endregion
 }

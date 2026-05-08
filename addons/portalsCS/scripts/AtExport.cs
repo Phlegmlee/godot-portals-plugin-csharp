@@ -1,14 +1,13 @@
 using System.Diagnostics;
-using System.Linq;
 using Godot;
 using Godot.Collections;
 namespace Portals3D;
 
 public partial class AtExport : GodotObject
 {
-	static Dictionary<string, Variant> BaseExport(string propname, int type)
+	static Dictionary BaseExport(string propname, int type)
 	{
-		return new Dictionary<string, Variant>()
+		return new Dictionary()
 		{
 			{ "Name", propname },
 			{ "Type", type },
@@ -16,9 +15,9 @@ public partial class AtExport : GodotObject
 		};
 	}
 
-	internal static Dictionary<string, Variant> ExportButton(string propname, string buttonText, string buttonIcon = "Callable")
+	internal static Dictionary ExportButton(string propname, string buttonText, string buttonIcon = "Callable")
 	{
-		Dictionary<string, Variant> result = BaseExport(propname, (int)Godot.Variant.Type.Callable);
+		Dictionary result = BaseExport(propname, (int)Godot.Variant.Type.Callable);
 
 		Debug.Assert(!buttonText.Contains(','), "Button text cannot contain a comma.");
 
@@ -28,9 +27,9 @@ public partial class AtExport : GodotObject
 		return result;
 	}
 
-	internal static Dictionary<string, Variant> ExportBool(string propname, bool groupEnable = false)
+	internal static Dictionary ExportBool(string propname, bool groupEnable = false)
 	{
-		Dictionary<string, Variant> result = BaseExport(propname, (int)Godot.Variant.Type.Bool);
+		Dictionary result = BaseExport(propname, (int)Godot.Variant.Type.Bool);
 
 		// if (groupEnable)
 		// {
@@ -40,46 +39,50 @@ public partial class AtExport : GodotObject
 		return result;
 	}
 
-	internal static Dictionary<string, Variant> ExportColor(string propname)
+	internal static Dictionary ExportColor(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.Color);
 	}
 
-	internal static Dictionary<string, Variant> ExportColorNoAlpha(string propname)
+	internal static Dictionary ExportColorNoAlpha(string propname)
 	{
-		Dictionary<string, Variant> result = BaseExport(propname, (int)Godot.Variant.Type.Color);
+		Dictionary result = BaseExport(propname, (int)Godot.Variant.Type.Color);
 		result["hint"] = (int)PropertyHint.ColorNoAlpha;
 		return result;
 	}
 
-	internal static Dictionary<string, Variant> ExportInt(string propname)
+	internal static Dictionary ExportInt(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.Int);
 	}
 
-	internal static Dictionary<string, Variant> ExportIntFlags(string propname, Array options)
+	internal static Dictionary ExportIntFlags(string propname, Array options)
 	{
-		// TODO
+		// TODO: Export int flags
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportIntPhysics3dFlags(string propname)
+	internal static Dictionary ExportIntPhysics3dFlags(string propname)
 	{
-		// TODO
+		// TODO: export int physics flags
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportIntRange(string propname, int min, int max, int step = 1, Array<string> extraHints = null)
+	internal static Dictionary ExportIntRange(string propname, int min, int max, int step = 1, Array<string> extraHints = null)
 	{
-		// TODO
+		// TODO: Export int range 
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportIntRender3d(string propname)
+	internal static Dictionary ExportIntRender3d(string propname)
 	{
-		// TODO
+		// TODO export int render 3d
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportEnum(string propname, StringName parentAndEnum, Variant enumClass)
+	internal static Dictionary ExportEnum(string propname, StringName parentAndEnum, Variant enumClass)
 	{
-		Dictionary<string, Variant> result = ExportInt(propname);
+		Dictionary result = ExportInt(propname);
 
 		result["class_name"] = parentAndEnum;
 		result["hint"] = (int)PropertyHint.Enum;
@@ -89,14 +92,14 @@ public partial class AtExport : GodotObject
 		return result;
 	}
 
-	internal static Dictionary<string, Variant> ExportFloat(string propname)
+	internal static Dictionary ExportFloat(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.Float);
 	}
 
-	internal static Dictionary<string, Variant> ExportFloatRange(string propname, float min, float max, float step = 0.01f, Array<string> extraHints = null)
+	internal static Dictionary ExportFloatRange(string propname, float min, float max, float step = 0.01f, Array<string> extraHints = null)
 	{
-		Dictionary<string, Variant> result = ExportFloat(propname);
+		Dictionary result = ExportFloat(propname);
 		string hintString = $"{min}, {max}, {step}";
 
 		if (extraHints.Count > 0)
@@ -113,42 +116,45 @@ public partial class AtExport : GodotObject
 		return result;
 	}
 
-	internal static Dictionary<string, Variant> ExportNode(string propname, StringName nodeClass)
+	internal static Dictionary ExportNode(string propname, StringName nodeClass)
 	{
-		// TODO
+		// TODO: Export node
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportString(string propname)
+	internal static Dictionary ExportString(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.String);
 	}
 
-	internal static Dictionary<string, Variant> ExportVector2(string propname)
+	internal static Dictionary ExportVector2(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.Vector2);
 	}
 
-	internal static Dictionary<string, Variant> ExportVector3(string propname)
+	internal static Dictionary ExportVector3(string propname)
 	{
 		return BaseExport(propname, (int)Godot.Variant.Type.Vector3);
 	}
 
-	internal static Dictionary<string, Variant> ExportGroup(string groupName, string prefix = "")
+	internal static Dictionary ExportGroup(string groupName, string prefix = "")
 	{
-		// TODO
+		// TODO: Export group
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportGroupEnd()
+	internal static Dictionary ExportGroupEnd()
 	{
 		return ExportGroup("");
 	}
 
-	internal static Dictionary<string, Variant> ExportSubgroup(string subgroupName, string prefix = "")
+	internal static Dictionary ExportSubgroup(string subgroupName, string prefix = "")
 	{
-		// TODO
+		// TODO: Export subgroup
+		return [];
 	}
 
-	internal static Dictionary<string, Variant> ExportSubgroupEnd()
+	internal static Dictionary ExportSubgroupEnd()
 	{
 		return ExportSubgroup("");
 	}
