@@ -117,10 +117,10 @@ public partial class Portal3D : Node3D
 
 	#endregion
 
-	#region Options Members
+	#region Export Members
 
 	private Vector2 _portalSize = new(2.0f, 2.5f);
-	public Vector2 PortalSize
+	[Export] public Vector2 PortalSize
 	{
 		get => _portalSize;
 		set
@@ -136,7 +136,7 @@ public partial class Portal3D : Node3D
 	}
 
 	private Portal3D _exitPortal = null;
-	public Portal3D ExitPortal
+	[Export] public Portal3D ExitPortal
 	{
 		get => _exitPortal;
 		set
@@ -151,10 +151,11 @@ public partial class Portal3D : Node3D
 	internal Callable _TbPairPortals = Callable.From(() => EditorPairPortals());
 	internal Callable _TbSyncPortalSizes = Callable.From(() => EditorSyncPortalSizes());
 
-	public Camera3D PlayerCamera;
+	[ExportGroup("Rendering")]
+	[Export] public Camera3D PlayerCamera;
 
 	private float _portalFrameWidth = 0.0f;
-	public float PortalFrameWidth
+	[Export(PropertyHint.Range, "0.0, 10.0, 0.01")] public float PortalFrameWidth
 	{
 		get => _portalFrameWidth;
 		set => _portalFrameWidth = value;
@@ -167,7 +168,7 @@ public partial class Portal3D : Node3D
 		Fractional
 	}
 	private PortalViewportSizeMode _viewportSizeMode = PortalViewportSizeMode.Full;
-	public PortalViewportSizeMode ViewportSizeMode
+	[Export] public PortalViewportSizeMode ViewportSizeMode
 	{
 		get => _viewportSizeMode;
 		set
@@ -187,14 +188,14 @@ public partial class Portal3D : Node3D
 		OnlyBack
 	}
 	private PortalViewDirection _viewDirection = PortalViewDirection.FrontAndBack;
-	public PortalViewDirection ViewDirection
+	[Export] public PortalViewDirection ViewDirection
 	{
 		get => _viewDirection;
 		set => _viewDirection = value;
 	}
 
 	private uint _portalRenderLayer = 1 << 19;
-	public uint PortalRenderLayer
+	[Export(PropertyHint.Layers3DRender)] public uint PortalRenderLayer
 	{
 		get => _portalRenderLayer;
 		set
@@ -208,7 +209,8 @@ public partial class Portal3D : Node3D
 	}
 
 	private bool _isTeleport = true;
-	public bool IsTeleport
+	[ExportGroup("Teleport")]
+	[Export] public bool IsTeleport
 	{
 		get => _isTeleport;
 		set
@@ -229,21 +231,21 @@ public partial class Portal3D : Node3D
 		FrontAndBack
 	}
 	private PortalTeleportDirection _teleportDirection = PortalTeleportDirection.FrontAndBack;
-	public PortalTeleportDirection TeleportDirection
+	[Export] public PortalTeleportDirection TeleportDirection
 	{
 		get => _teleportDirection;
 		set => _teleportDirection = value;
 	}
 
 	private float _rigidbodyBoost = 0.0f;
-	public float RigidbodyBoost
+	[Export(PropertyHint.Range, "0.0, 5.0, 0.01, or_greater")] public float RigidbodyBoost
 	{
 		get => _rigidbodyBoost;
 		set => _rigidbodyBoost = value;
 	}
 
 	private float _teleportTolerance = 0.5f;
-	public float TeleportTolerance
+	[Export(PropertyHint.Range, "0.0, 5.0, 0.01, or_greater")] public float TeleportTolerance
 	{
 		get => _teleportTolerance;
 		set => _teleportTolerance = value;
@@ -256,21 +258,22 @@ public partial class Portal3D : Node3D
 		DuplicateMeshes = 1 << 2
 	}
 	private int _teleportInteractions = (int)PortalTeleportInteractions.Callback | (int)PortalTeleportInteractions.PlayerUpright;
-	public int TeleportInteractions
+	[Export(PropertyHint.Flags, "Callback, Player Upright, Duplicate Meshes")] public int TeleportInteractions
 	{
 		get => _teleportInteractions;
 		set => _teleportInteractions = value;
 	}
 
 	private int _teleportCollisionMask = 1 << 15;
-	public int TeleportCollisionMask
+	[Export(PropertyHint.Layers3DPhysics)] public int TeleportCollisionMask
 	{
 		get => _teleportCollisionMask;
 		set => _teleportCollisionMask = value;
 	}
 
 	private bool _startDeactivated = false;
-	public bool StartDeactivated
+	[ExportGroup("Advanced")]
+	[Export] public bool StartDeactivated
 	{
 		get => _startDeactivated;
 		set => _startDeactivated = value;
@@ -589,33 +592,6 @@ public partial class Portal3D : Node3D
 		}
 
 		return [.. warnings];
-	}
-
-	private Array<Dictionary> GetPortalPropertyList()
-	{
-		Array<Dictionary> config = [];
-
-		config.Add(AtExport.ExportVector2("PortalSize"));
-
-		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
-		{
-			config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
-		}
-
-		config.Add(AtExport.ExportNode("ExitPortal", "Portal3D"));
-
-		if (ExitPortal != null && ExitPortal.ExitPortal == null)
-		{
-			config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
-		}
-
-		config.Add(AtExport.ExportGroup("Rendering"));
-		config.Add(AtExport.ExportNode("PlayerCamera", "Camera3D"));
-		config.Add(AtExport.ExportFloatRange("PortalFrameWidth", 0.0f, 10.0f, 0.01f));
-
-		//config.Add(AtExport.ExportEnum("ViewportSizeMode", (StringName)"Portal3D.PortalViewportSizeMode", ));
-
-		return config;
 	}
 
 	#endregion

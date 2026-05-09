@@ -1,3 +1,9 @@
-[gd_scene format=3 uid="uid://cqx0qist38kmq"]
+[gd_scene load_steps=2 format=3 uid="uid://cqx0qist38kmq"]
+
+[ext_resource type="Script" uid="uid://sgo73u0y6rmi" path="res://addons/portalsCS/scripts/Portal3D.cs" id="1_ig7tw"]
 
 [node name="Main" type="Node3D"]
+
+[node name="Portal3D" type="Node3D" parent="."]
+script = ExtResource("1_ig7tw")
+metadata/_custom_type_script = "uid://sgo73u0y6rmi"
