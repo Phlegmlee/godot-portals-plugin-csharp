@@ -1,6 +1,8 @@
 #if TOOLS
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 namespace Portals3D;
@@ -112,8 +114,9 @@ public partial class Portal3D : Node3D
 		return GetWorld3D().DirectSpaceState.IntersectRay(query);
 	}
 
-	//const StringName OnTeleportCallback = &"OnTeleport";
-	// TODO: const callbacks
+	private static readonly StringName OnTeleportCallback = new("OnTeleport");
+	private static readonly StringName DuplicateMeshesCallback = new("GetTeleportableMeshes");
+	private static readonly StringName TeleportRootMeta = new("TeleportRoot");
 
 	#endregion
 
@@ -367,10 +370,10 @@ public partial class Portal3D : Node3D
 
 	#region Editor Configuration
 
-	// TODO: Portal shader here
-	// TODO: Editor preview material here
+	private static readonly Shader PortalShader = GD.Load<Shader>("uid://csiava4euv75d");
+	private static readonly StandardMaterial3D EditorPreviewMaterial = GD.Load<StandardMaterial3D>("uid://suwscljyisas");
 
-	private void _EditorReady()
+	private void EditorReady()
 	{
 		//AddToGroup()
 		SetNotifyTransform(true);
@@ -453,25 +456,331 @@ public partial class Portal3D : Node3D
 
 	#region Gameplay Logic
 
+	public override void _Ready()
+	{
+		if (Engine.IsEditorHint())
+		{
+			CallDeferred("EditorReady");
+			return;
+		}
+
+		if (PlayerCamera == null)
+		{
+			PlayerCamera = GetViewport().GetCamera3D();
+			Debug.Assert(PlayerCamera != null, "Player camera is missing!");
+		}
+
+		ShaderMaterial material = new() { Shader = PortalShader };
+		PortalMesh.MaterialOverride = material;
+
+		if (!StartDeactivated)
+		{
+			SetupCameras();
+		}
+		else
+		{
+			CallDeferred("Deactivate");
+		}
+
+		if (IsTeleport)
+		{
+			TeleportArea.AreaEntered += OnTeleportAreaEntered;
+			TeleportArea.AreaExited += OnTeleportAreaExited;
+			TeleportArea.BodyEntered += OnTeleportBodyEntered;
+			TeleportArea.BodyExited += OnTeleportBodyExited;
+			TeleportArea.CollisionMask = (uint)TeleportCollisionMask;
+		}
+	}
+
+	public override void _Process(double delta)
+	{
+		if (Engine.IsEditorHint()) return;
+
+		if (IsTeleport) ProcessTeleports();
+
+		ProcessCameras();
+	}
+
+	private void ProcessCameras()
+	{
+		if (PortalCamera == null)
+		{
+			GD.PushError($"{Name}: No portal camera");
+			return;
+		}
+		if (PlayerCamera == null)
+		{
+			GD.PushError($"{Name}: No player camera");
+			return;
+		}
+		if (ExitPortal == null)
+		{
+			GD.PushError($"{Name}: No exit portal");
+			return;
+		}
+
+		PortalCamera.GlobalTransform = this.ToExitTransform(PlayerCamera.GlobalTransform);
+		PortalCamera.Near = CalculateNearPlane();
+		PortalCamera.Fov = PlayerCamera.Fov;
+
+		Vector2I pvSize = PortalViewport.Size;
+		double degrees = PlayerCamera.Fov * 0.5;
+		double halfHeight = PlayerCamera.Near * Math.Tan(degrees * (Math.PI / 180.0));
+		double halfWidth = halfHeight * pvSize.X / pvSize.Y;
+		float nearDiagonal = new Vector3((float)halfWidth, (float)halfHeight, PlayerCamera.Near).Length();
+		PortalMesh.Scale = PortalMesh.Scale with { Z = nearDiagonal };
+
+		bool playerInFrontOfPortal = ForwardDistance(PlayerCamera) > 0;
+		float portalShift = 0.0f;
+		switch (ViewDirection)
+		{
+			case PortalViewDirection.OnlyFront:
+				portalShift = 1.0f;
+				break;
+
+			case PortalViewDirection.OnlyBack:
+				portalShift = -1.0f;
+				break;
+
+			case PortalViewDirection.FrontAndBack:
+				if (playerInFrontOfPortal) portalShift = 1.0f; else portalShift = -1.0f;
+				break;
+		}
+
+		Vector3 newScale = PortalMesh.Scale;
+		newScale.Z *= Math.Sign(portalShift);
+		PortalMesh.Scale = newScale;
+	}
+
+	private void ProcessTeleports()
+	{
+		foreach (int bodyId in WatchlistTeleportables.Keys)
+		{
+			if (!IsInstanceIdValid((ulong)bodyId))
+			{
+				EraseTpMetadata(bodyId);
+				continue;
+			}
+
+			TeleportableMetadata tpMetadata = WatchlistTeleportables[bodyId];
+			Node3D body = (Node3D)InstanceFromId((ulong)bodyId);
+			float lastFwAngle = tpMetadata.Forward;
+			float currentFwAngle = ForwardDistance(body);
+
+			bool shouldTeleport = false;
+			switch (TeleportDirection)
+			{
+				case PortalTeleportDirection.Front:
+					shouldTeleport = lastFwAngle > 0 && currentFwAngle <= 0;
+					break;
+
+				case PortalTeleportDirection.Back:
+					shouldTeleport = lastFwAngle < 0 && currentFwAngle >= 0;
+					break;
+
+				case PortalTeleportDirection.FrontAndBack:
+					shouldTeleport = Math.Sign(lastFwAngle) != Math.Sign(currentFwAngle);
+					break;
+
+				default:
+					Debug.Assert(false, "This switch should be exhaustive.");
+					break;
+			}
+
+			if (shouldTeleport && Math.Abs(currentFwAngle) < TeleportTolerance)
+			{
+				Variant teleportablePath = body.GetMeta(TeleportRootMeta, ".");
+				Node3D teleportable = (Node3D)body.GetNode((string)teleportablePath);
+				teleportable.GlobalTransform = ToExitTransform(teleportable.GlobalTransform);
+
+				// FIXME: This might not work...it seems like it should but if object redirection/boosting isn't working this is most likley why.
+				if (teleportable is RigidBody3D rigidTeleportable)
+				{
+					rigidTeleportable.LinearVelocity = ToExitDirection(rigidTeleportable.LinearVelocity);
+					rigidTeleportable.ApplyCentralImpulse(rigidTeleportable.LinearVelocity.Normalized() * RigidbodyBoost);
+				}
+
+				EmitSignal(SignalName.OnTeleport, teleportable);
+				ExitPortal.EmitSignal(SignalName.OnTeleportReceive, teleportable);
+
+				if (tpMetadata.IsPlayer)
+				{
+					ProcessCameras();
+					ExitPortal.ProcessCameras();
+				}
+
+				if (tpMetadata.IsPlayer && CheckTpInteraction((int)PortalTeleportInteractions.PlayerUpright))
+				{
+					GetTree().CreateTween().TweenProperty(teleportable, "rotation:x", 0, 0.3);
+					GetTree().CreateTween().TweenProperty(teleportable, "rotation:z", 0, 0.3);
+				}
+
+				if (CheckTpInteraction((int)PortalTeleportInteractions.Callback))
+				{
+					if (teleportable.HasMethod(OnTeleportCallback)) teleportable.Call(OnTeleportCallback, this);
+				}
+
+				TransferTpMetadataToExit(body);
+			}
+			else
+			{
+				tpMetadata.Forward = currentFwAngle;
+				for (int i = 0; i < tpMetadata.MeshClones.Count; i++)
+				{
+					MeshInstance3D mesh = tpMetadata.Meshes[i];
+					MeshInstance3D clone = tpMetadata.MeshClones[i];
+					clone.GlobalTransform = ToExitTransform(mesh.GlobalTransform);
+				}
+			}
+		}
+	}
+	
+	private float CalculateNearPlane()
+	{
+		Aabb aabb = new
+		(
+			new Vector3(-ExitPortal.PortalSize.X / 2, -ExitPortal.PortalSize.Y / 2, 0),
+			new Vector3(ExitPortal.PortalSize.X, ExitPortal.PortalSize.Y, 0)
+		);
+
+		Vector3 pos = aabb.Position;
+		Vector3 size = aabb.Size;
+
+		Vector3 corner1 = ExitPortal.ToGlobal(new Vector3(pos.X, pos.Y, 0));
+		Vector3 corner2 = ExitPortal.ToGlobal(new Vector3(pos.X + size.X, pos.Y, 0));
+		Vector3 corner3 = ExitPortal.ToGlobal(new Vector3(pos.X + size.X, pos.Y + size.Y, 0));
+		Vector3 corner4 = ExitPortal.ToGlobal(new Vector3(pos.X, pos.Y + size.Y, 0));
+
+		Vector3 cameraForward = -PortalCamera.GlobalTransform.Basis.Z.Normalized();
+
+		float d1 = (corner1 - PortalCamera.GlobalPosition).Dot(cameraForward);
+		float d2 = (corner2 - PortalCamera.GlobalPosition).Dot(cameraForward);
+		float d3 = (corner3 - PortalCamera.GlobalPosition).Dot(cameraForward);
+		float d4 = (corner4 - PortalCamera.GlobalPosition).Dot(cameraForward);
+
+		return Math.Max(0.01f, (float)new[] { d1, d2, d3, d4 }.Min() - ExitPortal.PortalFrameWidth);
+	}
+
 	private void SetupMesh()
 	{
-		// TODO: Setup Mesh Method
+		if (PortalMesh != null) return;
+
+		MeshInstance3D meshInstance = new()
+		{
+			Name = this.Name + "_Mesh",
+			CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
+			Layers = PortalRenderLayer
+		};
+
+		PortalBoxMesh boxMesh = new()
+		{
+			Size = new Vector3(PortalSize.X, PortalSize.Y, 1)
+		};
+
+		meshInstance.Mesh = boxMesh;
+		meshInstance.Scale = meshInstance.Scale with { Z = PortalThickness };
+
+		meshInstance.MaterialOverride = EditorPreviewMaterial;
+
+		AddChildInEditor(this, meshInstance);
+		PortalMeshPath = GetPathTo(meshInstance);
 	}
 
 	private void SetupCameras()
 	{
-		// TODO: Setup Cameras Method
+		Debug.Assert(!Engine.IsEditorHint(), "This should never run in editor.");
+		Debug.Assert(PortalCamera == null);
+		Debug.Assert(PortalViewport == null);
+
+		if (ExitPortal == null)
+		{
+			GD.PushError($"{Name} has no exit portal, failed to setup cameras.");
+			return;
+		}
+
+		PortalViewport = new SubViewport
+		{
+			Name = this.Name + "_SubViewport",
+			Size = CalculateViewportSize()
+		};
+		AddChild(PortalViewport, true);
+
+		Godot.Environment adjustedEnv = null;
+		if (PlayerCamera.Environment != null)
+		{
+			adjustedEnv = (Godot.Environment)PlayerCamera.Environment.Duplicate();
+		}
+		else
+		{
+			adjustedEnv = (Godot.Environment)PlayerCamera.GetWorld3D().Environment.Duplicate();
+		}
+
+		adjustedEnv.TonemapMode = Godot.Environment.ToneMapper.Linear;
+		adjustedEnv.TonemapExposure = 1;
+
+		PortalCamera = new Camera3D
+		{
+			Name = this.Name + "_Camera3D",
+			Environment = adjustedEnv
+		};
+
+		PortalCamera.CullMask ^= PortalRenderLayer;
+
+		PortalViewport.AddChild(PortalCamera, true);
+		PortalCamera.GlobalPosition = ExitPortal.GlobalPosition;
+
+		ShaderMaterial material = (ShaderMaterial)PortalMesh.MaterialOverride;
+		material.SetShaderParameter("albedo", PortalViewport.GetTexture());
+
+		Viewport vp = GetViewport();
+		if (vp.IsConnected(Viewport.SignalName.SizeChanged, Callable.From(OnWindowResize)))
+		{
+			vp.SizeChanged += OnWindowResize;
+		}
+		else
+		{
+			GD.PushError($"{Name} has no exit portal, failed to setup cameras.");
+		}
 	}
 
 	#endregion
 
 	#region Event Handlers
 
+	private void OnTeleportAreaEntered(Area3D area)
+	{
+		if (WatchlistTeleportables.ContainsKey((int)area.GetInstanceId())) return;
+
+		ConstructTpMetadata(area);
+	}
+
+	private void OnTeleportBodyEntered(Node3D body)
+	{
+		if (WatchlistTeleportables.ContainsKey((int)body.GetInstanceId())) return;
+
+		ConstructTpMetadata(body);
+	}
+
+	private void OnTeleportAreaExited(Area3D area)
+	{
+		EraseTpMetadata((int)area.GetInstanceId());
+	}
+
+	private void OnTeleportBodyExited(Node3D body)
+	{
+		EraseTpMetadata((int)body.GetInstanceId());
+	}
+
+	private void OnWindowResize()
+	{
+		if (PortalViewport != null) PortalViewport.Size = CalculateViewportSize();
+	}
+
 	#endregion
 
 	#region UTILS
 
-	private void ContructTpMetadata(Node3D node)
+	private void ConstructTpMetadata(Node3D node)
 	{
 		// TODO: Construct TP Metadata
 	}
