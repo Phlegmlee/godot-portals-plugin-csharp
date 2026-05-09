@@ -27,7 +27,7 @@ namespace Portals3D;
 	I recommend creating a scene with Portal3D as a root and re-using that.
 */
 
-[Tool, GlobalClass]
+[Tool, Icon("uid://d22d43uoy7fnv"), GlobalClass]
 public partial class Portal3D : Node3D
 {
 	#region Public API
