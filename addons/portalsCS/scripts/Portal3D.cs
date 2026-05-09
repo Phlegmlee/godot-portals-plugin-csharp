@@ -613,7 +613,7 @@ public partial class Portal3D : Node3D
 		config.Add(AtExport.ExportNode("PlayerCamera", "Camera3D"));
 		config.Add(AtExport.ExportFloatRange("PortalFrameWidth", 0.0f, 10.0f, 0.01f));
 
-		//config.Add(AtExport.ExportEnum())
+		//config.Add(AtExport.ExportEnum("ViewportSizeMode", (StringName)"Portal3D.PortalViewportSizeMode", ));
 
 		return config;
 	}

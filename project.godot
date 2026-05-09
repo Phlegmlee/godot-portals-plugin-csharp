@@ -16,3 +16,7 @@ config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 [dotnet]
 
 project/assembly_name="godot-portals-plugin-csharp"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/portalsCS/plugin.cfg")
