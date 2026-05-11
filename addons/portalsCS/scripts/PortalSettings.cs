@@ -1,7 +1,9 @@
+#if TOOLS
 using Godot;
 using Godot.Collections;
 namespace Portals3D;
 
+[Tool]
 public partial class PortalSettings : GodotObject
 {
 	internal static string QualName(string setting)
@@ -40,3 +42,4 @@ public partial class PortalSettings : GodotObject
 		return ProjectSettings.GetSetting(setting);
 	}
 }
+#endif

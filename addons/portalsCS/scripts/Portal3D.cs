@@ -1023,13 +1023,18 @@ public partial class Portal3D : Node3D
 		return [.. warnings];
 	}
 
-	private Array<Dictionary> GetPropertyList()
+	new private Array<Dictionary> GetPropertyList()
 	{
 		Array<Dictionary> config = [];
 
 		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
 		{
 			config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
+		}
+
+		if (ExitPortal != null && ExitPortal.ExitPortal == null)
+		{
+			config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
 		}
 
 		return config;

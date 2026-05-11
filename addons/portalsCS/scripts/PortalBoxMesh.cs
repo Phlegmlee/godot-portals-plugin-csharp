@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Godot;
 namespace Portals3D;
 
+[Tool]
 public partial class PortalBoxMesh : ArrayMesh
 {
 	private Vector3 _size = new(1.0f, 1.0f, 1.0f);
-	[Export] public Vector3 Size
+	[Export]
+	public Vector3 Size
 	{
 		get => _size;
 		set
@@ -100,7 +102,7 @@ public partial class PortalBoxMesh : ArrayMesh
 		surfaceArray[(int)ArrayType.TexUV] = uvs.ToArray();
 		surfaceArray[(int)ArrayType.Normal] = normals.ToArray();
 		surfaceArray[(int)ArrayType.Index] = indices.ToArray();
-		
+
 		AddSurfaceFromArrays(PrimitiveType.Triangles, surfaceArray);
 	}
 }

@@ -9,8 +9,8 @@ public partial class AtExport : GodotObject
 	{
 		return new Dictionary()
 		{
-			{ "Name", propname },
-			{ "Type", type },
+			{ "name", propname },
+			{ "type", type },
 			{ "usage", (int)PropertyUsageFlags.Default | (int)PropertyUsageFlags.ScriptVariable }
 		};
 	}
