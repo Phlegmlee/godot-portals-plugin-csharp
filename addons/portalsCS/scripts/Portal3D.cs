@@ -753,13 +753,13 @@ public partial class Portal3D : Node3D
 		material.SetShaderParameter("albedo", PortalViewport.GetTexture());
 
 		Viewport vp = GetViewport();
-		if (vp.IsConnected(Viewport.SignalName.SizeChanged, Callable.From(OnWindowResize)))
+		if (!vp.IsConnected(Viewport.SignalName.SizeChanged, Callable.From(OnWindowResize)))
 		{
 			vp.SizeChanged += OnWindowResize;
 		}
 		else
 		{
-			GD.PushError($"{Name} has no exit portal, failed to setup cameras.");
+			GD.PushError($"{Name} failed to connect to OnWindowResize signal.");
 		}
 	}
 
@@ -802,7 +802,9 @@ public partial class Portal3D : Node3D
 
 	private void ConstructTpMetadata(Node3D node)
 	{
+		GD.Print(node);
 		Node teleportable = node.GetNode((NodePath)node.GetMeta(TeleportRootMeta, '.'));
+		GD.Print(teleportable);
 
 		TeleportableMetadata metadata = new()
 		{
