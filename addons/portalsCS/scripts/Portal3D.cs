@@ -7,32 +7,39 @@ using Godot;
 using Godot.Collections;
 namespace Portals3D;
 
-/*
-	Seamless 3D portal
-
-	To get started, create two Portal3D instances and set their [member exit_portal] to each other.
-	This creates a linked portal pair that you can look through. Make your player to collide with
-	[member teleport_collision_mask] and you will be able to walk back and forth through the portal.
-	[br][br]
-	To integrate portals into your game, you can make use of the [signal on_teleport] and 
-	[signal on_teleport_receive] signals. You can link a portal a different one by chaning its 
-	[member exit_portal] during gameplay. The next level is to make use of the portal's callbacks,
-	mainly the [member ON_TELEPORT_CALLBACK]. If you need to raycast through a portal, then the 
-	[method forward_raycast] method might come in handy! When it comes to optimization, you can use
-	the [method Activate] and [method Deactivate] methods to control which portals are consuming 
-	resources.
-	[br][br]
-	[b]TIP:[/b] If you change the default value of some property, it will not get synchronized into existing 
-	portal instances due to how Godot handles custom inspectors. For easier defaults management, 
-	I recommend creating a scene with Portal3D as a root and re-using that.
-*/
-
+/// <summary>
+/// <para>
+/// To get started, create two Portal3D instances and set their <c>Exit Portal</c> to each other.
+/// </para>
+/// <para>
+/// This creates a linked portal pair that you can look through. Make your player to collide with
+/// <c>TeleportCollisionMask</c> and you will be able to walk back and forth through the portal.
+/// </para>
+/// <para>
+/// To integrate portals into your game, you can make use of the <b>Signals</b> <c>OnTeleport</c> and <c>OnTeleportRecevie</c> during gameplay.
+/// </para>
+/// <para>
+/// The next level is to make use of the portal's callbacks, mainly <c>OnTeleportCallback</c>.
+/// </para>
+/// <para>
+/// If you need to raycast through a portal checkout the <c>ForwardRaycast</c> and <c>ForwardRaycastQuery</c> methods.
+/// </para>
+/// <para>
+/// For optimization, use the <c>Activate</c> and <c>Deactivate</c> methods to control which portals are consuming resources.
+/// </para>
+/// <para>
+/// <em><b>TIP:</b> For easy defaults management of various portals, create a scene with Portal3D and the root and re-use that scene instead.</em>
+/// </para>
+/// </summary>
 [Tool, Icon("uid://d22d43uoy7fnv"), GlobalClass]
 public partial class Portal3D : Node3D
 {
 	#region Public API
 
-	// Emitted when this portal teleports something. Also see signal on_teleport_receive.
+	/// <summary>
+	/// Emitted when this portal teleports something. Also see signal <c>OnTeleportReceive</c>.
+	/// </summary>
+	/// <param name="node"></param>
 	[Signal] public delegate void OnTeleportEventHandler(Node3D node);
 
 	// Emitted when this portal receives a teleported node.
