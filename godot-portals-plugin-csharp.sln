@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "godot-portals-plugin-csharp", "godot-portals-plugin-csharp.csproj", "{80B638B2-17B3-4ADD-99F6-CFAF626A2715}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "godot-portals-plugin-csharp", "godot-portals-plugin-csharp.csproj", "{4E4D3D1B-F731-46E4-858D-03D9A7589988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,11 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{80B638B2-17B3-4ADD-99F6-CFAF626A2715}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{4E4D3D1B-F731-46E4-858D-03D9A7589988}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
