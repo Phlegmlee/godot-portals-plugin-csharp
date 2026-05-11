@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://sgo73u0y6rmi" path="res://addons/portalsCS/scripts/Portal3D.cs" id="2_1bvp3"]
 [ext_resource type="Material" uid="uid://suwscljyisas" path="res://addons/portalsCS/materials/editor-preview-portal-material.tres" id="3_lquwl"]
-[ext_resource type="Script" uid="uid://bdb5qi0a0jo5t" path="res://CharacterBody3d.cs" id="4_1bvp3"]
+[ext_resource type="Script" uid="uid://bdb5qi0a0jo5t" path="res://examples/testing_grounds/CharacterBody3d.cs" id="4_1bvp3"]
 [ext_resource type="Script" uid="uid://bhesarmo8b3gu" path="res://addons/portalsCS/scripts/PortalBoxMesh.cs" id="4_7mycd"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1bvp3"]
