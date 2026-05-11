@@ -830,6 +830,12 @@ public partial class Portal3D : Node3D
 
 	private void EraseTpMetadata(ulong nodeId)
 	{
+		// FIXME: Double lookup here, this is preventing an error
+		//	where the lookup assignment 1 line below this is throws
+		//	a key not found exception...maybe the method is getting called
+		//	multiple times?
+		if (!WatchlistTeleportables.ContainsKey(nodeId)) return;
+
 		TeleportableMetadata metadata = WatchlistTeleportables[nodeId];
 		if (metadata != null)
 		{
