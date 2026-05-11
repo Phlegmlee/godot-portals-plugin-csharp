@@ -11,8 +11,11 @@ This is an unofficial project created to make the [godot-portals-plugin](https:/
 
 ## Documentation
 
-TBA
+XML based comments within the plugin files comming soon.
 
 ## [Issues](https://github.com/Phlegmlee/godot-portals-plugin-csharp/issues)
 
 If you have any problems while using this plugin, create an [issue](https://github.com/Phlegmlee/godot-portals-plugin-csharp/issues).
+
+#### NOTE:
+_This plugin was originally converted for personal use, support once the plugin is on-par with the gdscript version will be limited._
