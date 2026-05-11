@@ -1,9 +1,85 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqx0qist38kmq"]
+[gd_scene load_steps=8 format=4 uid="uid://cqx0qist38kmq"]
 
-[ext_resource type="Script" uid="uid://sgo73u0y6rmi" path="res://addons/portalsCS/scripts/Portal3D.cs" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://sgo73u0y6rmi" path="res://addons/portalsCS/scripts/Portal3D.cs" id="1_h2yge"]
+[ext_resource type="Material" uid="uid://suwscljyisas" path="res://addons/portalsCS/materials/editor-preview-portal-material.tres" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://bhesarmo8b3gu" path="res://addons/portalsCS/scripts/PortalBoxMesh.cs" id="3_lquwl"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_h2yge"]
+_surfaces = [{
+"aabb": AABB(-1.875, -2.0975, -1, 3.75, 4.195, 1),
+"attribute_data": PackedByteArray("AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPw=="),
+"format": 34359742487,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAQABAABAAUAAQADAAUABQADAAcAAwACAAcABwACAAYAAgAAAAYABgAAAAQABAAFAAYABgAFAAcAAAABAAIAAgABAAMA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("AADwv3E9BkAAAAAAAADwP3E9BkAAAAAAAADwv3E9BsAAAAAAAADwP3E9BsAAAAAAAADwv3E9BkAAAIC/AADwP3E9BkAAAIC/AADwv3E9BsAAAIC/AADwP3E9BsAAAIC//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgA==")
+}]
+script = ExtResource("3_lquwl")
+Size = Vector3(3.75, 4.195, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_1bvp3"]
+size = Vector3(3.75, 4.195, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_lquwl"]
+_surfaces = [{
+"aabb": AABB(-1.3575, -0.98, -1, 2.715, 1.96, 1),
+"attribute_data": PackedByteArray("AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPw=="),
+"format": 34359742487,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAQABAABAAUAAQADAAUABQADAAcAAwACAAcABwACAAYAAgAAAAYABgAAAAQABAAFAAYABgAFAAcAAAABAAIAAgABAAMA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("j8Ktv0jhej8AAAAAj8KtP0jhej8AAAAAj8Ktv0jher8AAAAAj8KtP0jher8AAAAAj8Ktv0jhej8AAIC/j8KtP0jhej8AAIC/j8Ktv0jher8AAIC/j8KtP0jher8AAIC//3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgA==")
+}]
+script = ExtResource("3_lquwl")
+Size = Vector3(2.715, 1.96, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7mycd"]
+size = Vector3(2.715, 1.96, 1)
 
 [node name="Main" type="Node3D"]
 
-[node name="Portal3D" type="Node3D" parent="."]
-script = ExtResource("1_ig7tw")
+[node name="Portal3D" type="Node3D" parent="." node_paths=PackedStringArray("ExitPortal")]
+process_priority = 100
+process_physics_priority = 100
+script = ExtResource("1_h2yge")
+PortalSize = Vector2(3.75, 4.195)
+ExitPortal = NodePath("../Portal3D2")
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
+metadata/_edit_group_ = true
+
+[node name="Portal3D_Mesh" type="MeshInstance3D" parent="Portal3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.05, 0, 0, 0)
+layers = 524288
+material_override = ExtResource("2_1bvp3")
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_h2yge")
+
+[node name="TeleportArea" type="Area3D" parent="Portal3D"]
+
+[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D/TeleportArea"]
+shape = SubResource("BoxShape3D_1bvp3")
+
+[node name="Portal3D2" type="Node3D" parent="."]
+process_priority = 100
+process_physics_priority = 100
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+script = ExtResource("1_h2yge")
+PortalSize = Vector2(2.715, 1.96)
+metadata/_custom_type_script = "uid://sgo73u0y6rmi"
+metadata/_edit_group_ = true
+
+[node name="Portal3D2_Mesh" type="MeshInstance3D" parent="Portal3D2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.05, 0, 0, 0)
+layers = 524288
+material_override = ExtResource("2_1bvp3")
+cast_shadow = 0
+mesh = SubResource("ArrayMesh_lquwl")
+
+[node name="TeleportArea" type="Area3D" parent="Portal3D2"]
+
+[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D2/TeleportArea"]
+shape = SubResource("BoxShape3D_7mycd")

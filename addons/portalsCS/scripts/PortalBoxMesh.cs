@@ -1,4 +1,5 @@
 #if TOOLS
+using System.Collections.Generic;
 using Godot;
 namespace Portals3D;
 
@@ -31,10 +32,10 @@ public partial class PortalBoxMesh : ArrayMesh
 		Godot.Collections.Array surfaceArray = [];
 		surfaceArray.Resize((int)ArrayType.Max);
 
-		Godot.Collections.Array<Vector3> vertices = [];
-		Godot.Collections.Array<Vector2> uvs = [];
-		Godot.Collections.Array<Vector3> normals = [];
-		Godot.Collections.Array<int> indices = [];
+		List<Vector3> vertices = [];
+		List<Vector2> uvs = [];
+		List<Vector3> normals = [];
+		List<int> indices = [];
 
 		float w = Size.X / 2.0f;
 		float h = Size.Y / 2.0f;
@@ -95,13 +96,12 @@ public partial class PortalBoxMesh : ArrayMesh
 			2, 1, 3, // Front section
 		]);
 
-		surfaceArray[(int)ArrayType.Vertex] = vertices;
-		surfaceArray[(int)ArrayType.TexUV] = uvs;
-		surfaceArray[(int)ArrayType.Normal] = normals;
-		surfaceArray[(int)ArrayType.Index] = indices;
-
+		surfaceArray[(int)ArrayType.Vertex] = vertices.ToArray();
+		surfaceArray[(int)ArrayType.TexUV] = uvs.ToArray();
+		surfaceArray[(int)ArrayType.Normal] = normals.ToArray();
+		surfaceArray[(int)ArrayType.Index] = indices.ToArray();
+		
 		AddSurfaceFromArrays(PrimitiveType.Triangles, surfaceArray);
 	}
-
 }
 #endif

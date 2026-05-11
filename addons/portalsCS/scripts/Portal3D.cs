@@ -80,7 +80,7 @@ public partial class Portal3D : Node3D
 			start,
 			goal,
 			rayCast.CollisionMask,
-			[] //TODO: Finish parameters
+			[this.TeleportArea.GetRid(), ExitPortal.TeleportArea.GetRid()]
 		);
 		query.CollideWithAreas = rayCast.CollideWithAreas;
 		query.CollideWithBodies = rayCast.CollideWithBodies;
@@ -150,9 +150,8 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	// FIXME these may need to be public???
-	internal Callable _TbPairPortals = Callable.From(() => EditorPairPortals());
-	internal Callable _TbSyncPortalSizes = Callable.From(() => EditorSyncPortalSizes());
+	public Callable _TbPairPortals = Callable.From(() => MethodName.EditorPairPortals);
+	public Callable _TbSyncPortalSizes = Callable.From(() => MethodName.EditorSyncPortalSizes);
 
 	[ExportGroup("Rendering")]
 	[Export] public Camera3D PlayerCamera;
@@ -364,7 +363,7 @@ public partial class Portal3D : Node3D
 		public Array<MeshInstance3D> MeshClones = [];
 	}
 
-	internal Godot.Collections.Dictionary<int, TeleportableMetadata> WatchlistTeleportables = [];
+	internal Godot.Collections.Dictionary<ulong, TeleportableMetadata> WatchlistTeleportables = [];
 
 	#endregion
 
@@ -375,7 +374,7 @@ public partial class Portal3D : Node3D
 
 	private void EditorReady()
 	{
-		//AddToGroup()
+		AddToGroup((StringName)PortalSettings.GetSetting("PortalsGroupName"), true);
 		SetNotifyTransform(true);
 
 		ProcessPriority = 100;
@@ -400,14 +399,18 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	private static void EditorPairPortals()
+	private void EditorPairPortals()
 	{
-		// TODO: Editor Pair Portals
+		Debug.Assert(ExitPortal != null, "My own exit has to be set!");
+		ExitPortal.ExitPortal = this;
+		NotifyPropertyListChanged();
 	}
 
-	private static void EditorSyncPortalSizes()
+	private void EditorSyncPortalSizes()
 	{
-		// TODO: Editor Sync Portal Size
+		Debug.Assert(ExitPortal != null, "My own exit has to be set!");
+		PortalSize = ExitPortal.PortalSize;
+		NotifyPropertyListChanged();
 	}
 
 	private void SetupTeleport()
@@ -431,8 +434,7 @@ public partial class Portal3D : Node3D
 
 		Area3D area = new() { Name = "TeleportArea" };
 
-		// TODO: Method AddChildInEditor
-
+		AddChildInEditor(this, area);
 		TeleportAreaPath = GetPathTo(area);
 
 		CollisionShape3D collider = new() { Name = "TeleportCollider" };
@@ -440,16 +442,27 @@ public partial class Portal3D : Node3D
 		box.Size = box.Size with { X = PortalSize.X, Y = PortalSize.Y };
 		collider.Shape = box;
 
-		// TODO: Method AddChildInEditor
+		AddChildInEditor(TeleportArea, collider);
 		TeleportColliderPath = GetPathTo(collider);
 	}
 
 	private void OnPortalSizeChanged()
 	{
-		if (PortalMesh == null) return;
+		if (PortalMesh == null)
+		{
+			GD.PushError("Failed to update portal size, portal has no mesh");
+			return;	
+		}
 
-		// TODO: Implement PortalBoxMesh 
-		// Finish this method
+		PortalBoxMesh pbm = (PortalBoxMesh)PortalMesh.Mesh;
+		pbm.Size = new Vector3(PortalSize.X, PortalSize.Y, 1);
+		PortalMesh.Scale = PortalMesh.Scale with { Z = PortalThickness };
+
+		if (IsTeleport && TeleportCollider != null)
+		{
+			BoxShape3D boxShape = (BoxShape3D)TeleportCollider.Shape;
+			boxShape.Size = boxShape.Size with { X = PortalSize.X, Y = PortalSize.Y };
+		}
 	}
 
 	#endregion
@@ -554,9 +567,9 @@ public partial class Portal3D : Node3D
 
 	private void ProcessTeleports()
 	{
-		foreach (int bodyId in WatchlistTeleportables.Keys)
+		foreach (ulong bodyId in WatchlistTeleportables.Keys)
 		{
-			if (!IsInstanceIdValid((ulong)bodyId))
+			if (!IsInstanceIdValid(bodyId))
 			{
 				EraseTpMetadata(bodyId);
 				continue;
@@ -589,7 +602,7 @@ public partial class Portal3D : Node3D
 
 			if (shouldTeleport && Math.Abs(currentFwAngle) < TeleportTolerance)
 			{
-				Variant teleportablePath = body.GetMeta(TeleportRootMeta, ".");
+				Variant teleportablePath = body.GetMeta(TeleportRootMeta, '.');
 				Node3D teleportable = (Node3D)body.GetNode((string)teleportablePath);
 				teleportable.GlobalTransform = ToExitTransform(teleportable.GlobalTransform);
 
@@ -749,26 +762,26 @@ public partial class Portal3D : Node3D
 
 	private void OnTeleportAreaEntered(Area3D area)
 	{
-		if (WatchlistTeleportables.ContainsKey((int)area.GetInstanceId())) return;
+		if (WatchlistTeleportables.ContainsKey(area.GetInstanceId())) return;
 
 		ConstructTpMetadata(area);
 	}
 
 	private void OnTeleportBodyEntered(Node3D body)
 	{
-		if (WatchlistTeleportables.ContainsKey((int)body.GetInstanceId())) return;
+		if (WatchlistTeleportables.ContainsKey(body.GetInstanceId())) return;
 
 		ConstructTpMetadata(body);
 	}
 
 	private void OnTeleportAreaExited(Area3D area)
 	{
-		EraseTpMetadata((int)area.GetInstanceId());
+		EraseTpMetadata(area.GetInstanceId());
 	}
 
 	private void OnTeleportBodyExited(Node3D body)
 	{
-		EraseTpMetadata((int)body.GetInstanceId());
+		EraseTpMetadata(body.GetInstanceId());
 	}
 
 	private void OnWindowResize()
@@ -782,56 +795,133 @@ public partial class Portal3D : Node3D
 
 	private void ConstructTpMetadata(Node3D node)
 	{
-		// TODO: Construct TP Metadata
+		Node teleportable = node.GetNode((NodePath)node.GetMeta(TeleportRootMeta, '.'));
+
+		TeleportableMetadata metadata = new()
+		{
+			Forward = ForwardDistance(node),
+			IsPlayer = !teleportable.GetPathTo(PlayerCamera).ToString().StartsWith('.')
+		};
+
+		if (metadata.IsPlayer) SetPortalPairUpdateMode(SubViewport.UpdateMode.Always);
+
+		if (CheckTpInteraction((int)PortalTeleportInteractions.DuplicateMeshes)
+		&& node.HasMethod(DuplicateMeshesCallback))
+		{
+			metadata.Meshes = (Array<MeshInstance3D>)node.Call(DuplicateMeshesCallback);
+			foreach (MeshInstance3D mesh in metadata.Meshes)
+			{
+				MeshInstance3D dupeMesh = (MeshInstance3D)mesh.Duplicate(0);
+				dupeMesh.Name = mesh.Name + "_Clone";
+				metadata.MeshClones.Add(dupeMesh);
+				AddChild(dupeMesh, true);
+			}
+			EnableMeshClipping(metadata, this);
+		}
+		WatchlistTeleportables.Add(node.GetInstanceId(), metadata);
 	}
 
-	private void EraseTpMetadata(int nodeId)
+	private void EraseTpMetadata(ulong nodeId)
 	{
-		// TODO: Erase TP Metadata
+		TeleportableMetadata metadata = WatchlistTeleportables[nodeId];
+		if (metadata != null)
+		{
+			if (metadata.IsPlayer) SetPortalPairUpdateMode(SubViewport.UpdateMode.WhenVisible);
+
+			foreach (MeshInstance3D mesh in metadata.Meshes) DisableMeshClipping(mesh);
+			foreach (MeshInstance3D meshClone in metadata.MeshClones) meshClone.QueueFree();
+		}
+		WatchlistTeleportables.Remove(nodeId);
 	}
 
 	private void TransferTpMetadataToExit(Node3D body)
 	{
-		// TODO: Transfer TP Metadata
+		if (!ExitPortal.IsTeleport) return; // If one way teleport
+
+		ulong bodyId = body.GetInstanceId();
+		TeleportableMetadata metadata = WatchlistTeleportables[bodyId];
+		Debug.Assert(metadata != null, "Attempted to transfer teleport metadata for a node that is not being watched.");
+
+		metadata.Forward = ExitPortal.ForwardDistance(body);
+		EnableMeshClipping(metadata, ExitPortal);
+
+		ExitPortal.WatchlistTeleportables.Add(bodyId, metadata);
+
+		if (metadata.IsPlayer && ExitPortal.ExitPortal != this)
+		{
+			PortalViewport.RenderTargetUpdateMode = SubViewport.UpdateMode.WhenVisible;
+			ExitPortal.SetPortalPairUpdateMode(SubViewport.UpdateMode.Always);
+		}
+		WatchlistTeleportables.Remove(bodyId);
 	}
 
 	private void EnableMeshClipping(TeleportableMetadata metadata, Portal3D alongPortal)
 	{
-		// TODO: Enable Mesh Clipping
+		foreach (MeshInstance3D meshInstance in metadata.Meshes)
+		{
+			Vector3 clipNormal = Math.Sign(metadata.Forward) * alongPortal.GlobalBasis.Z;
+			meshInstance.SetInstanceShaderParameter("portal_clip_active", true);
+			meshInstance.SetInstanceShaderParameter("portal_clip_point", alongPortal.GlobalPosition);
+			meshInstance.SetInstanceShaderParameter("portal_clip_normal", clipNormal);
+		}
+
+		Portal3D exitPortal = alongPortal.ExitPortal;
+		foreach (MeshInstance3D meshClone in metadata.MeshClones)
+		{
+			Vector3 clipNormal = Math.Sign(metadata.Forward) * exitPortal.GlobalBasis.Z;
+			meshClone.SetInstanceShaderParameter("portal_clip_active", true);
+			meshClone.SetInstanceShaderParameter("portal_clip_point", alongPortal.GlobalPosition);
+			meshClone.SetInstanceShaderParameter("portal_clip_normal", clipNormal);
+		}
 	}
 
 	private void DisableMeshClipping(MeshInstance3D meshInstance)
 	{
-		// TODO: Disable mesh clipping
+		meshInstance.SetInstanceShaderParameter("portal_clip_active", false);
 	}
 
 	private Transform3D ToExitTransform(Transform3D gTransform)
 	{
-		// TODO: To Exit transform
-		return new Transform3D();
+		Transform3D relativeToPortal = GlobalTransform.AffineInverse() * gTransform;
+		Transform3D flippedTransform = relativeToPortal.Rotated(Vector3.Up, (float)Math.PI);
+		Transform3D relativeToTarget = ExitPortal.GlobalTransform * flippedTransform;
+		return relativeToTarget;
 	}
 
 	private Vector3 ToExitDirection(Vector3 real)
 	{
-		// TODO: To Exit Direction
-		return Vector3.Zero;
+		Vector3 relativeToPortal = GlobalBasis.Inverse() * real;
+		Vector3 flippedVector = relativeToPortal.Rotated(Vector3.Up, (float)Math.PI);
+		Vector3 relativeToTarget = ExitPortal.GlobalBasis * flippedVector;
+		return relativeToTarget;
 	}
 
 	private Vector3 ToExitPosition(Vector3 gPos)
 	{
-		// TODO: To Exit Position method
-		return Vector3.Zero;
+		Vector3 localVector = GlobalTransform.AffineInverse() * gPos;
+		Vector3 rotatedVector = localVector.Rotated(Vector3.Up, (float)Math.PI);
+		Vector3 localAtExit = ExitPortal.GlobalTransform * rotatedVector;
+		return localAtExit;
 	}
 
 	private float ForwardDistance(Node3D node)
 	{
-		// TODO: Forward distance
-		return 0.0f;
+		Vector3 portalFront = this.GlobalTransform.Basis.Z.Normalized();
+		Vector3 nodeRelative = node.GlobalTransform.Origin - this.GlobalTransform.Origin;
+		return portalFront.Dot(nodeRelative);
 	}
 
 	private void AddChildInEditor(Node parent, Node node)
 	{
-		// TODO: Add child in editor
+		parent.AddChild(node, true);
+		if (this.Owner == null)
+		{
+			node.Owner = this;
+		}
+		else
+		{
+			node.Owner = this.Owner;
+		}
 	}
 
 	private bool CausedByUserInteraction()
@@ -841,30 +931,60 @@ public partial class Portal3D : Node3D
 
 	private void GroupNode(Node node)
 	{
-		// TODO: Group Node
+		node.SetMeta("_edit_group_", true);
 	}
 
 	private Vector2I CalculateViewportSize()
 	{
-		// TODO: Calculate viewport size
-		return new Vector2I();
+		Vector2I viewportSize = (Vector2I)GetViewport().GetVisibleRect().Size;
+		float aspectRatio = viewportSize.X / viewportSize.Y;
+
+		switch (ViewportSizeMode)
+		{
+			case PortalViewportSizeMode.Full:
+				return viewportSize;
+
+			case PortalViewportSizeMode.MaxWidthAbsolute:
+				int width = Math.Min(ViewportSizeMaxWidthAbsolute, viewportSize.X);
+				return new Vector2I(width, (int)(width / aspectRatio));
+
+			case PortalViewportSizeMode.Fractional:
+				Vector2 calculateFractional = (Vector2)viewportSize * ViewportSizeFractional;
+				return (Vector2I)calculateFractional;
+		}
+
+		GD.PushError("Failed to determine desired viewport size.");
+		return new Vector2I
+		(
+			(int)ProjectSettings.GetSetting("display/window/size/viewport_width"),
+			(int)ProjectSettings.GetSetting("display/window/size/viewport_height")
+		);
 	}
 
 	private bool CheckTpInteraction(int flag)
 	{
-		// TODO; Check tp interaction
-		return false;
+		return (TeleportInteractions & flag) > 0;
 	}
 
 	private void SetPortalPairUpdateMode(SubViewport.UpdateMode mode)
 	{
-		// TODO: Set portal pair update mode
+		Debug.Assert(IsInstanceIdValid(ExitPortal.GetInstanceId()));
+		this.PortalViewport.RenderTargetUpdateMode = mode;
+		if (ExitPortal.PortalViewport != null) ExitPortal.PortalViewport.RenderTargetUpdateMode = mode;
 	}
 
 	private Vector3 LineIntersection(Vector3 start, Vector3 end)
 	{
-		// TODO: Line intersection
-		return Vector3.Zero;
+		Vector3 planeNormal = -GlobalBasis.Z;
+		Vector3 planePoint = GlobalPosition;
+
+		Vector3 lineDir = end - start;
+		float denom = planeNormal.Dot(lineDir);
+
+		if (Math.Abs(denom) < 1e-6) return Vector3.Zero;
+
+		float t = planeNormal.Dot(planePoint - start) / denom;
+		return start + lineDir * t;
 	}
 
 	#endregion
@@ -901,6 +1021,18 @@ public partial class Portal3D : Node3D
 		}
 
 		return [.. warnings];
+	}
+
+	private Array<Dictionary> GetPropertyList()
+	{
+		Array<Dictionary> config = [];
+
+		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
+		{
+			config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
+		}
+
+		return config;
 	}
 
 	#endregion
