@@ -33,7 +33,7 @@ public partial class AtExport : GodotObject
 
 		// if (groupEnable)
 		// {
-		// 	result["hint"] = PropertyHint.GroupEnable; //FIXME
+		// 	result["hint"] = PropertyHint.GroupEnable; //FIXME: ExportBool
 		// }
 
 		return result;

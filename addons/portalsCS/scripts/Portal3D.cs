@@ -275,7 +275,8 @@ public partial class Portal3D : Node3D
 
 	private bool _startDeactivated = false;
 	[ExportGroup("Advanced")]
-	[Export] public bool StartDeactivated
+	[Export]
+	public bool StartDeactivated
 	{
 		get => _startDeactivated;
 		set => _startDeactivated = value;
@@ -285,7 +286,6 @@ public partial class Portal3D : Node3D
 
 	#region Internal
 
-	//FIXME: These first 4 members are @export_storage in gdscript, this is what I chose to do for the rewrite.
 	private float _portalThickness = 0.05f;
 	internal float PortalThickness
 	{
@@ -298,7 +298,7 @@ public partial class Portal3D : Node3D
 	}
 
 	private NodePath _portalMeshPath;
-	internal NodePath PortalMeshPath
+	public NodePath PortalMeshPath
 	{
 		get => _portalMeshPath;
 		set => _portalMeshPath = value;
@@ -991,12 +991,12 @@ public partial class Portal3D : Node3D
 
 	#region Godot Editor Integrations
 
-	private string[] GetConfigurationWarnings()
+	public override string[] _GetConfigurationWarnings()
 	{
 		List<string> warnings = [];
 
 		Vector3 globalScale = GlobalBasis.Scale;
-		if (globalScale.IsEqualApprox(Vector3.One))
+		if (!globalScale.IsEqualApprox(Vector3.One))
 		{
 			warnings.Add
 			(
@@ -1020,10 +1020,12 @@ public partial class Portal3D : Node3D
 			);
 		}
 
+		base._GetConfigurationWarnings();
+
 		return [.. warnings];
 	}
 
-	new private Array<Dictionary> GetPropertyList()
+	public override Array<Dictionary> _GetPropertyList()
 	{
 		Array<Dictionary> config = [];
 
@@ -1036,6 +1038,33 @@ public partial class Portal3D : Node3D
 		{
 			config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
 		}
+
+		config.Add(new Dictionary()
+		{
+			{"name", "PortalThickness"},
+			{"type", (int)Variant.Type.Float},
+			{"usage", (int)PropertyUsageFlags.Storage}
+		});
+		config.Add(new Dictionary()
+		{
+			{"name", "PortalMeshPath"},
+			{"type", (int)Variant.Type.NodePath},
+			{"usage", (int)PropertyUsageFlags.Storage}
+		});
+		config.Add(new Dictionary()
+		{
+			{"name", "TeleportAreaPath"},
+			{"type", (int)Variant.Type.NodePath},
+			{"usage", (int)PropertyUsageFlags.Storage}
+		});
+		config.Add(new Dictionary()
+		{
+			{"name", "TeleportColliderPath"},
+			{"type", (int)Variant.Type.NodePath},
+			{"usage", (int)PropertyUsageFlags.Storage}
+		});
+
+		base._GetPropertyList();
 
 		return config;
 	}
