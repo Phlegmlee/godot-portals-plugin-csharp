@@ -609,7 +609,7 @@ public partial class Portal3D : Node3D
 
 			if (shouldTeleport && Math.Abs(currentFwAngle) < TeleportTolerance)
 			{
-				Variant teleportablePath = body.GetMeta(TeleportRootMeta, '.');
+				Variant teleportablePath = body.GetMeta(TeleportRootMeta, ".");
 				Node3D teleportable = (Node3D)body.GetNode((string)teleportablePath);
 				teleportable.GlobalTransform = ToExitTransform(teleportable.GlobalTransform);
 
@@ -802,9 +802,7 @@ public partial class Portal3D : Node3D
 
 	private void ConstructTpMetadata(Node3D node)
 	{
-		GD.Print(node);
-		Node teleportable = node.GetNode((NodePath)node.GetMeta(TeleportRootMeta, '.'));
-		GD.Print(teleportable);
+		Node teleportable = node.GetNode((NodePath)node.GetMeta(TeleportRootMeta, "."));
 
 		TeleportableMetadata metadata = new()
 		{
@@ -840,7 +838,7 @@ public partial class Portal3D : Node3D
 			foreach (MeshInstance3D mesh in metadata.Meshes) DisableMeshClipping(mesh);
 			foreach (MeshInstance3D meshClone in metadata.MeshClones) meshClone.QueueFree();
 		}
-		WatchlistTeleportables.Remove(nodeId);
+		if (!WatchlistTeleportables.Remove(nodeId)) return;
 	}
 
 	private void TransferTpMetadataToExit(Node3D body)
