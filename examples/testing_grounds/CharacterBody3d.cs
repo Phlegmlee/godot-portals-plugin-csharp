@@ -1,8 +1,9 @@
 using Godot;
-using System;
 
 public partial class CharacterBody3d : CharacterBody3D
 {
+	[Export] public MeshInstance3D CharacterMesh;
+
 	public const float Speed = 5.0f;
 	public const float JumpVelocity = 4.5f;
 
@@ -39,5 +40,11 @@ public partial class CharacterBody3d : CharacterBody3D
 
 		Velocity = velocity;
 		MoveAndSlide();
+	}
+
+	public Godot.Collections.Array<MeshInstance3D> GetTeleportableMeshes()
+	{
+		Godot.Collections.Array<MeshInstance3D> result = [CharacterMesh];
+		return result;
 	}
 }

@@ -1,9 +1,11 @@
-[gd_scene load_steps=22 format=4 uid="uid://7ococexk7rjo"]
+[gd_scene load_steps=31 format=4 uid="uid://7ococexk7rjo"]
 
 [ext_resource type="Script" uid="uid://sgo73u0y6rmi" path="res://addons/portalsCS/scripts/Portal3D.cs" id="2_786yg"]
+[ext_resource type="Shader" uid="uid://bepxpnpjma6cp" path="res://examples/ClippableMesh.gdshader" id="2_hjrjw"]
 [ext_resource type="Material" uid="uid://suwscljyisas" path="res://addons/portalsCS/materials/editor-preview-portal-material.tres" id="3_hjrjw"]
 [ext_resource type="Script" uid="uid://bdb5qi0a0jo5t" path="res://examples/testing_grounds/CharacterBody3d.cs" id="4_1bvp3"]
 [ext_resource type="Script" uid="uid://bhesarmo8b3gu" path="res://addons/portalsCS/scripts/PortalBoxMesh.cs" id="4_bm2m2"]
+[ext_resource type="Script" uid="uid://xccqj30nflon" path="res://examples/testing_grounds/ClippableMesh.cs" id="6_bm2m2"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1bvp3"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -32,13 +34,37 @@ albedo_color = Color(0.798896, 0.328218, 0, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1bvp3"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bm2m2"]
+render_priority = 0
+shader = ExtResource("2_hjrjw")
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_1bvp3"]
+material = SubResource("ShaderMaterial_bm2m2")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hjrjw"]
+render_priority = 0
+shader = ExtResource("2_hjrjw")
+
+[sub_resource type="TorusMesh" id="TorusMesh_hjrjw"]
+material = SubResource("ShaderMaterial_hjrjw")
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_bm2m2"]
+points = PackedVector3Array(0.7235525, 0.07204743, 0.67132235, 0.47637385, -0.07532536, 0, 0.47637385, 0.08331467, 0, 0.0063617527, -0.09899601, 0.9789201, -0.03174603, 0.2738095, 0.66664183, 0.8797884, -0.21149726, 0.048270755, 0.7905914, 0.24574862, 0.052820474, -0.03174603, -0.23412389, 0.5713789, 0.55980664, -0.22663827, 0.6435662, 0.42406762, 0.20820116, 0.78020805, 0.63491136, -0.26587301, 0, 0.97114944, -0.03951681, 0.21762693, -0.03174603, 0.08331467, 0.47621536, 0.6664958, 0.2738095, 0, 0.21769078, 0.047299482, 0.97034776, 0.9734071, 0.10605714, 0.041179124, 0.670221, 0.23708723, 0.48053226, 0.61340094, -0.117321655, 0.7505216, 0.022157995, -0.23810428, 0.82113993, 0.018917317, 0.19035353, 0.909349, 0.8046065, -0.14554796, 0.50793654, 0.86751384, 0.15696791, 0.3688603, 0.31191877, -0.14854795, 0.8961369, -0.03174603, -0.26587301, 0.63482124, 0.47820047, 0.046024144, 0.8725656, -0.03174603, -0.07532536, 0.47621536, 0.83908784, -0.0376277, 0.53568894, 0.7828429, -0.23153655, 0.3140565, -0.03174603, 0.14681295, 0.50793654, 0.97742236, -0.09892331, 0.03728556, 0.53954273, -0.20232192, 0, 0.6118791, 0.17704123, 0.6942659)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_daeaq"]
+points = PackedVector3Array(-0.97066814, -0.039208412, 0.21968581, -0.063440636, 0.07820384, 0.9831561, -0.19341996, 0.07580943, 0.9678282, -0.66647714, 0.2738095, 0, -0.03174603, -0.26587301, 0.63482124, -0.6347839, -0.26587301, 0, -0.03174603, 0.08331467, 0.47621536, -0.56460184, -0.2001236, 0.6983608, -0.6951039, 0.17526256, 0.6132691, -0.03174603, 0.2738095, 0.66664183, -0.47622156, -0.07532536, 0, -0.97359186, 0.10551777, 0.043645147, -0.07618696, -0.1548571, 0.9410518, -0.6189189, -0.03677922, 0.7799698, -0.8813408, -0.21061827, 0.050145965, -0.31672344, 0.23872402, 0.7563934, -0.70140386, -0.22827744, 0.4806349, -0.5080111, 0.14681295, 0, -0.81365204, 0.21107118, 0.3422953, -0.8393454, -0.037143745, 0.535366, -0.03174603, -0.17062561, 0.50793654, -0.42826936, 0.12683961, 0.86290777, -0.39925456, -0.09297688, 0.8959124, -0.31668934, -0.23082617, 0.78412205, -0.86695033, 0.10006583, 0.45305896, -0.86349505, -0.14553456, 0.39928657, -0.08153203, 0.18943384, 0.9073683, -0.6739222, 0.23615468, 0.48064187, -0.97756714, -0.098430105, 0.039541602, -0.539608, -0.20232192, 0, -0.6440861, 0.07086161, 0.7487045, -0.90889025, 0.1894095, 0.051451955)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uo5mi"]
+points = PackedVector3Array(0.97092056, -0.039368533, -0.21861684, 0.038378008, -0.09868448, -0.9774951, 0.0423851, 0.105793364, -0.973488, 0.47621536, -0.07532536, 0, 0.66664183, 0.2738095, 0, 0, 0.14681295, -0.50793654, 0, -0.26587301, -0.63482124, 0.61453104, 0.15064271, -0.72120905, 0.6997441, -0.22901915, -0.48054773, 0.63482124, -0.26587301, 0, 0, 0.2738095, -0.66664183, 0.56192064, -0.09051982, -0.80501837, 0.9735066, 0.10579745, -0.042366434, 0.7796184, 0.20775884, -0.42648306, 0.31445378, -0.23105398, -0.78439003, 0.88059825, -0.21103904, -0.049248315, 0.31448793, 0.23894896, -0.75663143, 0.83921957, -0.03738808, -0.535529, 0, -0.20232192, -0.5396577, 0.33700863, 0.04669185, -0.93530095, 0.50793654, 0.14681295, 0, 0.8667881, 0.100574434, -0.4527685, 0, 0.08331467, -0.47621536, 0.8630727, -0.14628272, -0.39874285, 0.589313, 0.2347155, -0.589313, 0.97748953, -0.098683275, -0.038383525, 0.141832, 0.18702601, -0.90218264, 0.9021719, 0.18702103, -0.14184195, 0.64362603, -0.17240527, -0.6707469, 0.3141914, -0.14830306, -0.8955136, 0.049248923, -0.21103875, -0.8805977, 0.616888, 0.044838358, -0.78048587)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2x3ts"]
+points = PackedVector3Array(-0.9699701, 0.047264095, -0.21921077, -0.21861684, -0.039368533, -0.97092056, -0.21921137, 0.047264006, -0.96996915, -0.47621536, -0.07532536, 0, 0, 0.2738095, -0.66664183, 0, -0.26587301, -0.63482124, -0.78439003, -0.23105398, -0.31445378, -0.66664183, 0.2738095, 0, -0.66770464, 0.1770903, -0.6410905, -0.63482124, -0.26587301, 0, -0.58848137, -0.14380506, -0.74965507, 0, 0.08331467, -0.47621536, -0.9774951, -0.09868448, -0.038378008, -0.04458713, -0.1552996, -0.94225854, -0.86525697, -0.06468948, -0.4804702, -0.05025944, 0.18989393, -0.9083592, -0.3144538, -0.23105393, -0.78439, -0.9083546, 0.18989179, -0.050264735, -0.589313, 0.2347155, -0.589313, -0.61688805, 0.044838388, -0.78048605, -0.50793654, 0.14681295, 0, 0, -0.20232192, -0.5396577, -0.42648306, 0.20775884, -0.7796184, -0.86385494, 0.12716746, -0.42586088, -0.75663143, 0.23894896, -0.31448793, -0.699746, -0.22902144, -0.48054746, -0.3968603, -0.093239784, -0.89696455, -0.8805977, -0.21103875, -0.049248923, -0.042366434, 0.10579745, -0.9735066, -0.8955136, -0.14830306, -0.3141914, 0, 0.24206036, -0.60310006, 0, -0.07532536, -0.47621536)
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_1bvp3"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_lquwl"]
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_daeaq"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_uo5mi"]
 _surfaces = [{
 "aabb": AABB(-1, -1.25, -1, 2, 2.5, 1),
 "attribute_data": PackedByteArray("AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPw=="),
@@ -53,10 +79,10 @@ _surfaces = [{
 script = ExtResource("4_bm2m2")
 Size = Vector3(2, 2.5, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_uo5mi"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_2x3ts"]
 size = Vector3(2, 2.5, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_786yg"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_hdhqv"]
 _surfaces = [{
 "aabb": AABB(-1, -1.25, -1, 2, 2.5, 1),
 "attribute_data": PackedByteArray("AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPw=="),
@@ -71,10 +97,10 @@ _surfaces = [{
 script = ExtResource("4_bm2m2")
 Size = Vector3(2, 2.5, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_hjrjw"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_hy4wy"]
 size = Vector3(2, 2.5, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_bm2m2"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_xdxme"]
 _surfaces = [{
 "aabb": AABB(-1, -1.25, -1, 2, 2.5, 1),
 "attribute_data": PackedByteArray("AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AACAPwAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAIA/AACAPw=="),
@@ -89,7 +115,7 @@ _surfaces = [{
 script = ExtResource("4_bm2m2")
 Size = Vector3(2, 2.5, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_daeaq"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_esbko"]
 size = Vector3(2, 2.5, 1)
 
 [node name="Main" type="Node3D"]
@@ -112,10 +138,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 16)
 material_override = SubResource("StandardMaterial3D_h2yge")
 size = Vector3(3, 3, 3)
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("CharacterMesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
 collision_layer = 32769
 collision_mask = 32769
 script = ExtResource("4_1bvp3")
+CharacterMesh = NodePath("MeshInstance3D")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 shape = SubResource("CapsuleShape3D_1bvp3")
@@ -124,6 +152,31 @@ shape = SubResource("CapsuleShape3D_1bvp3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
 mesh = SubResource("CapsuleMesh_1bvp3")
+
+[node name="clippableMesh" type="RigidBody3D" parent="." node_paths=PackedStringArray("SelfMesh")]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, -12)
+collision_layer = 32769
+collision_mask = 32769
+gravity_scale = 0.0
+constant_force = Vector3(0, 0, 0.25)
+script = ExtResource("6_bm2m2")
+SelfMesh = NodePath("clippableTest")
+
+[node name="clippableTest" type="MeshInstance3D" parent="clippableMesh"]
+mesh = SubResource("TorusMesh_hjrjw")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="clippableMesh"]
+shape = SubResource("ConvexPolygonShape3D_bm2m2")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="clippableMesh"]
+shape = SubResource("ConvexPolygonShape3D_daeaq")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="clippableMesh"]
+shape = SubResource("ConvexPolygonShape3D_uo5mi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="clippableMesh"]
+shape = SubResource("ConvexPolygonShape3D_2x3ts")
 
 [node name="RigidBody3D" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -4)
@@ -142,71 +195,74 @@ process_physics_priority = 100
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
 script = ExtResource("2_786yg")
 ExitPortal = NodePath(".")
+TeleportInteractions = 7
 PortalThickness = 0.05
-PortalMeshPath = NodePath("Portal3D_Mesh")
-TeleportAreaPath = NodePath("TeleportArea")
-TeleportColliderPath = NodePath("TeleportArea/TeleportCollider")
+PortalMeshPath = NodePath("Portal3D_Mesh2")
+TeleportAreaPath = NodePath("TeleportArea2")
+TeleportColliderPath = NodePath("TeleportArea2/TeleportCollider")
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
 metadata/_edit_group_ = true
 
-[node name="Portal3D_Mesh" type="MeshInstance3D" parent="Portal3D"]
+[node name="Portal3D_Mesh2" type="MeshInstance3D" parent="Portal3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.05, 0, 0, 0)
 layers = 524288
 material_override = ExtResource("3_hjrjw")
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_daeaq")
+mesh = SubResource("ArrayMesh_uo5mi")
 
-[node name="TeleportArea" type="Area3D" parent="Portal3D"]
+[node name="TeleportArea2" type="Area3D" parent="Portal3D"]
 
-[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D/TeleportArea"]
-shape = SubResource("BoxShape3D_uo5mi")
+[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D/TeleportArea2"]
+shape = SubResource("BoxShape3D_2x3ts")
 
 [node name="Portal3D2" type="Node3D" parent="." node_paths=PackedStringArray("ExitPortal") groups=["Portals"]]
 process_priority = 100
 process_physics_priority = 100
-transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, -9, 0, -11)
+transform = Transform3D(-1, 0, -1.0331603e-07, 0, 1, 0, 1.0331603e-07, 0, -1, 0, 0, -7)
 script = ExtResource("2_786yg")
 ExitPortal = NodePath("../Portal3D3")
+TeleportInteractions = 7
 PortalThickness = 0.05
-PortalMeshPath = NodePath("Portal3D2_Mesh")
-TeleportAreaPath = NodePath("TeleportArea")
-TeleportColliderPath = NodePath("TeleportArea/TeleportCollider")
+PortalMeshPath = NodePath("Portal3D2_Mesh2")
+TeleportAreaPath = NodePath("TeleportArea2")
+TeleportColliderPath = NodePath("TeleportArea2/TeleportCollider")
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
 metadata/_edit_group_ = true
 
-[node name="Portal3D2_Mesh" type="MeshInstance3D" parent="Portal3D2"]
+[node name="Portal3D2_Mesh2" type="MeshInstance3D" parent="Portal3D2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.05, 0, 0, 0)
 layers = 524288
 material_override = ExtResource("3_hjrjw")
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_786yg")
+mesh = SubResource("ArrayMesh_hdhqv")
 
-[node name="TeleportArea" type="Area3D" parent="Portal3D2"]
+[node name="TeleportArea2" type="Area3D" parent="Portal3D2"]
 
-[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D2/TeleportArea"]
-shape = SubResource("BoxShape3D_hjrjw")
+[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D2/TeleportArea2"]
+shape = SubResource("BoxShape3D_hy4wy")
 
 [node name="Portal3D3" type="Node3D" parent="." node_paths=PackedStringArray("ExitPortal") groups=["Portals"]]
 process_priority = 100
 process_physics_priority = 100
-transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, 12, 0, -10)
+transform = Transform3D(1, 0, -1.5893256e-08, 0, 1, 0, 1.5893256e-08, 0, 1, 0, 0, -18)
 script = ExtResource("2_786yg")
 ExitPortal = NodePath("../Portal3D2")
+TeleportInteractions = 7
 PortalThickness = 0.05
-PortalMeshPath = NodePath("Portal3D3_Mesh")
-TeleportAreaPath = NodePath("TeleportArea")
-TeleportColliderPath = NodePath("TeleportArea/TeleportCollider")
+PortalMeshPath = NodePath("Portal3D3_Mesh2")
+TeleportAreaPath = NodePath("TeleportArea2")
+TeleportColliderPath = NodePath("TeleportArea2/TeleportCollider")
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
 metadata/_edit_group_ = true
 
-[node name="Portal3D3_Mesh" type="MeshInstance3D" parent="Portal3D3"]
+[node name="Portal3D3_Mesh2" type="MeshInstance3D" parent="Portal3D3"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.05, 0, 0, 0)
 layers = 524288
 material_override = ExtResource("3_hjrjw")
 cast_shadow = 0
-mesh = SubResource("ArrayMesh_bm2m2")
+mesh = SubResource("ArrayMesh_xdxme")
 
-[node name="TeleportArea" type="Area3D" parent="Portal3D3"]
+[node name="TeleportArea2" type="Area3D" parent="Portal3D3"]
 
-[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D3/TeleportArea"]
-shape = SubResource("BoxShape3D_daeaq")
+[node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D3/TeleportArea2"]
+shape = SubResource("BoxShape3D_esbko")
