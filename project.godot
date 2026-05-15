@@ -14,6 +14,7 @@ config/name="godot-portals-plugin-csharp"
 config/tags=PackedStringArray("plugin")
 run/main_scene="uid://7ococexk7rjo"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/icon="uid://ok5j2yoj2od4"
 
 [dotnet]
 
