@@ -6,4 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - YYYY-MM-DD
 ### Added
-- C# rewrite in progress.
+- Gizmos UI integration in-work.
+- Issues and PRs from main repo.
+
+### Fixed
+- .NET Assembly Unloading Error
+
+## [0.8.0] - 2026-05-15
+### Added
+- C# rewrite of main plugin completed.
