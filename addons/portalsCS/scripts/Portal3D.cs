@@ -825,7 +825,7 @@ public partial class Portal3D : Node3D
 			}
 			EnableMeshClipping(metadata, this);
 		}
-		WatchlistTeleportables.Add(node.GetInstanceId(), metadata);
+		WatchlistTeleportables.TryAdd(node.GetInstanceId(), metadata);
 	}
 
 	private void EraseTpMetadata(ulong nodeId)
@@ -858,7 +858,7 @@ public partial class Portal3D : Node3D
 		metadata.Forward = ExitPortal.ForwardDistance(body);
 		EnableMeshClipping(metadata, ExitPortal);
 
-		ExitPortal.WatchlistTeleportables.Add(bodyId, metadata);
+		ExitPortal.WatchlistTeleportables.TryAdd(bodyId, metadata);
 
 		if (metadata.IsPlayer && ExitPortal.ExitPortal != this)
 		{
