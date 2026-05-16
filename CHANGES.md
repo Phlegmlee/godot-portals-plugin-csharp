@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - .NET Assembly Unloading Error
 
+## [0.8.1] - 2026-05-15
+### Fixed
+- Smooth teleport clipping material updated to remove ghosting [Issue #3]
+- Duplicate meshes bug [Issue #5]
+- Start deactivated was missing its argument.
+
 ## [0.8.0] - 2026-05-15
 ### Added
 - C# rewrite of main plugin completed.
