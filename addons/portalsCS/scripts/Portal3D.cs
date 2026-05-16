@@ -883,7 +883,7 @@ public partial class Portal3D : Node3D
 		{
 			Vector3 clipNormal = Math.Sign(metadata.Forward) * exitPortal.GlobalBasis.Z;
 			meshClone.SetInstanceShaderParameter("portal_clip_active", true);
-			meshClone.SetInstanceShaderParameter("portal_clip_point", alongPortal.GlobalPosition);
+			meshClone.SetInstanceShaderParameter("portal_clip_point", exitPortal.GlobalPosition);
 			meshClone.SetInstanceShaderParameter("portal_clip_normal", clipNormal);
 		}
 	}
