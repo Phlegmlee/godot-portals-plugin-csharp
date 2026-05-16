@@ -583,7 +583,7 @@ public partial class Portal3D : Node3D
 			}
 
 			TeleportableMetadata tpMetadata = WatchlistTeleportables[bodyId];
-			Node3D body = (Node3D)InstanceFromId((ulong)bodyId);
+			Node3D body = (Node3D)InstanceFromId(bodyId);
 			float lastFwAngle = tpMetadata.Forward;
 			float currentFwAngle = ForwardDistance(body);
 
