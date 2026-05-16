@@ -499,7 +499,7 @@ public partial class Portal3D : Node3D
 		}
 		else
 		{
-			CallDeferred("Deactivate");
+			CallDeferred("Deactivate", true);
 		}
 
 		if (IsTeleport)
