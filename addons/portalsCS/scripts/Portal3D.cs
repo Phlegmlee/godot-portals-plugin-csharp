@@ -645,12 +645,7 @@ public partial class Portal3D : Node3D
 			else
 			{
 				tpMetadata.Forward = currentFwAngle;
-				for (int i = 0; i < tpMetadata.MeshClones.Count; i++)
-				{
-					MeshInstance3D mesh = tpMetadata.Meshes[i];
-					MeshInstance3D clone = tpMetadata.MeshClones[i];
-					clone.GlobalTransform = ToExitTransform(mesh.GlobalTransform);
-				}
+				UpdateTpCloneTransforms(tpMetadata, this);
 			}
 		}
 	}
@@ -849,14 +844,24 @@ public partial class Portal3D : Node3D
 
 	private void TransferTpMetadataToExit(Node3D body)
 	{
-		if (!ExitPortal.IsTeleport) return; // If one way teleport
-
 		ulong bodyId = body.GetInstanceId();
 		TeleportableMetadata metadata = WatchlistTeleportables[bodyId];
 		Debug.Assert(metadata != null, "Attempted to transfer teleport metadata for a node that is not being watched.");
 
+		// Self-teleport edge case to keep metadata and refresh clipping.
+		if (ExitPortal == this)
+		{
+			metadata.Forward = ForwardDistance(body);
+			EnableMeshClipping(metadata, this);
+			UpdateTpCloneTransforms(metadata, this);
+			return;
+		}
+
+		if (!ExitPortal.IsTeleport) return; // If one way teleport.
+
 		metadata.Forward = ExitPortal.ForwardDistance(body);
 		EnableMeshClipping(metadata, ExitPortal);
+		UpdateTpCloneTransforms(metadata, ExitPortal);
 
 		ExitPortal.WatchlistTeleportables.TryAdd(bodyId, metadata);
 
@@ -866,6 +871,16 @@ public partial class Portal3D : Node3D
 			ExitPortal.SetPortalPairUpdateMode(SubViewport.UpdateMode.Always);
 		}
 		WatchlistTeleportables.Remove(bodyId);
+	}
+	
+	private void UpdateTpCloneTransforms(TeleportableMetadata metadata, Portal3D portal)
+	{
+		for (int i = 0; i < metadata.MeshClones.Count; i++)
+		{
+			MeshInstance3D mesh = metadata.Meshes[i];
+			MeshInstance3D clone = metadata.MeshClones[i];
+			clone.GlobalTransform = portal.ToExitTransform(mesh.GlobalTransform);
+		}
 	}
 
 	private void EnableMeshClipping(TeleportableMetadata metadata, Portal3D alongPortal)
