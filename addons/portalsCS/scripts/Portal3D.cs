@@ -802,21 +802,24 @@ public partial class Portal3D : Node3D
 		TeleportableMetadata metadata = new()
 		{
 			Forward = ForwardDistance(node),
-			IsPlayer = !teleportable.GetPathTo(PlayerCamera).ToString().StartsWith('.')
+			IsPlayer = (teleportable == PlayerCamera) || teleportable.IsAncestorOf(PlayerCamera)
 		};
 
 		if (metadata.IsPlayer) SetPortalPairUpdateMode(SubViewport.UpdateMode.Always);
 
 		if (CheckTpInteraction((int)PortalTeleportInteractions.DuplicateMeshes)
-		&& node.HasMethod(DuplicateMeshesCallback))
+		&& teleportable.HasMethod(DuplicateMeshesCallback))
 		{
-			metadata.Meshes = (Array<MeshInstance3D>)node.Call(DuplicateMeshesCallback);
+			metadata.Meshes = (Array<MeshInstance3D>)teleportable.Call(DuplicateMeshesCallback);
 			foreach (MeshInstance3D mesh in metadata.Meshes)
 			{
 				MeshInstance3D dupeMesh = (MeshInstance3D)mesh.Duplicate(0);
 				dupeMesh.Name = mesh.Name + "_Clone";
 				metadata.MeshClones.Add(dupeMesh);
 				AddChild(dupeMesh, true);
+
+				Skeleton3D skeleton = mesh.GetNodeOrNull<Skeleton3D>(mesh.Skeleton);
+				if (skeleton != null) dupeMesh.Skeleton = dupeMesh.GetPathTo(skeleton);
 			}
 			EnableMeshClipping(metadata, this);
 		}
