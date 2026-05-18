@@ -136,7 +136,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_portalSize = value;
-			if (CausedByUserInteraction())
+			if (CausedByUserInteraction() && PortalMesh != null)
 			{
 				OnPortalSizeChanged();
 				UpdateConfigurationWarnings();
@@ -211,7 +211,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_portalRenderLayer = value;
-			if (CausedByUserInteraction())
+			if (CausedByUserInteraction() && PortalMesh != null)
 			{
 				PortalMesh.Layers = value;
 			}
@@ -301,7 +301,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_portalThickness = value;
-			if (CausedByUserInteraction()) OnPortalSizeChanged();
+			if (CausedByUserInteraction() && PortalMesh != null) OnPortalSizeChanged();
 		}
 	}
 
