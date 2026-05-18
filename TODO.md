@@ -2,7 +2,6 @@
 
 ## IMPORTANT:
 - [ ] Gizmos integration or rewrite.
-- [ ] Issues and PRs from main repo.
 - [ ] .NET Assebly Unloading Error
 	- See [MS Docs](https://learn.microsoft.com/en-us/dotnet/standard/assembly/unloadability#troubleshoot-unloadability-issues)
 	- See [Godot Issue #78513](https://github.com/godotengine/godot/issues/78513)
@@ -20,3 +19,4 @@
 
 ### Completed:
 - [x] Rewrite plugin into C#
+- [x] Issues and PRs from main repo.

@@ -6,11 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - YYYY-MM-DD
 ### Added
-- Gizmos UI integration in-work.
-- Issues and PRs from main repo.
+- Gizmos UI integration.
 
+## [Unreleased] - YYYY-MM-DD
 ### Fixed
 - .NET Assembly Unloading Error
+
+## [0.8.3] - 2026-05-17
+### Added
+- Third person camera smooth teleport support.
 
 ## [0.8.2] - 2026-05-17
 ### Fixed
