@@ -1,0 +1,27 @@
+[gd_scene load_steps=6 format=3 uid="uid://dinpm4jbrk6i5"]
+
+[ext_resource type="Script" uid="uid://bdb5qi0a0jo5t" path="res://examples/character/CharacterBody3d.cs" id="1_6rat6"]
+[ext_resource type="Shader" uid="uid://bepxpnpjma6cp" path="res://examples/ClippableMesh.gdshader" id="2_0hifg"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1bvp3"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bm2m2"]
+render_priority = 0
+shader = ExtResource("2_0hifg")
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1bvp3"]
+material = SubResource("ShaderMaterial_bm2m2")
+
+[node name="CharacterBody3D" type="CharacterBody3D" node_paths=PackedStringArray("CharacterMesh")]
+collision_layer = 32769
+collision_mask = 32769
+script = ExtResource("1_6rat6")
+CharacterMesh = NodePath("MeshInstance3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1bvp3")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_1bvp3")
