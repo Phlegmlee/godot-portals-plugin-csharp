@@ -157,8 +157,9 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	public Callable _TbPairPortals = Callable.From(() => MethodName.EditorPairPortals);
-	public Callable _TbSyncPortalSizes = Callable.From(() => MethodName.EditorSyncPortalSizes);
+	// FIXME: These callable lambdas are what is causing the .NET assembly failure, need a new button implementation. (Or none at all?)
+	// public Callable _TbPairPortals = Callable.From(() => MethodName.EditorPairPortals);
+	// public Callable _TbSyncPortalSizes = Callable.From(() => MethodName.EditorSyncPortalSizes);
 
 	[ExportGroup("Rendering")]
 	[Export] public Camera3D PlayerCamera;
@@ -1059,16 +1060,17 @@ public partial class Portal3D : Node3D
 	public override Array<Dictionary> _GetPropertyList()
 	{
 		Array<Dictionary> config = [];
+		
+		// TODO: Implement these buttons in a different way?
+		// if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
+		// {
+		// 	config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
+		// }
 
-		if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
-		{
-			config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
-		}
-
-		if (ExitPortal != null && ExitPortal.ExitPortal == null)
-		{
-			config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
-		}
+		// if (ExitPortal != null && ExitPortal.ExitPortal == null)
+		// {
+		// 	config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
+		// }
 
 		config.Add(new Dictionary()
 		{
