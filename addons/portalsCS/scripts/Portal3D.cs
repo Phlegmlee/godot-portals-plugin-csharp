@@ -314,7 +314,7 @@ public partial class Portal3D : Node3D
 	{
 		get
 		{
-			return PortalMeshPath != null ? GetNode<MeshInstance3D>(PortalMeshPath) : null;
+			return PortalMeshPath != null && PortalMeshPath != "" ? GetNode<MeshInstance3D>(PortalMeshPath) : null;
 		}
 	}
 
@@ -328,7 +328,7 @@ public partial class Portal3D : Node3D
 	{
 		get
 		{
-			return TeleportAreaPath != null ? GetNode<Area3D>(TeleportAreaPath) : null;
+			return TeleportAreaPath != null && TeleportAreaPath != "" ? GetNode<Area3D>(TeleportAreaPath) : null;
 		}
 	}
 
@@ -342,7 +342,7 @@ public partial class Portal3D : Node3D
 	{
 		get
 		{
-			return TeleportColliderPath != null ? GetNode<CollisionShape3D>(TeleportColliderPath) : null;
+			return TeleportColliderPath != null && TeleportColliderPath != "" ? GetNode<CollisionShape3D>(TeleportColliderPath) : null;
 		}
 	}
 
@@ -448,12 +448,12 @@ public partial class Portal3D : Node3D
 			if (TeleportArea != null)
 			{
 				TeleportArea.QueueFree();
-				TeleportAreaPath = new NodePath("");
+				TeleportAreaPath = null;
 			}
 			if (TeleportCollider != null)
 			{
 				TeleportCollider.QueueFree();
-				TeleportColliderPath = new NodePath("");
+				TeleportColliderPath = null;
 			}
 			return;
 		}

@@ -66,7 +66,7 @@ _surfaces = [{
 script = ExtResource("6_uo5mi")
 Size = Vector3(2, 2.5, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_hdhqv"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_bm2m2"]
 size = Vector3(2, 2.5, 1)
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_hy4wy"]
@@ -84,7 +84,7 @@ _surfaces = [{
 script = ExtResource("6_uo5mi")
 Size = Vector3(2, 2.5, 1)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xdxme"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_daeaq"]
 size = Vector3(2, 2.5, 1)
 
 [node name="Main" type="Node3D"]
@@ -141,12 +141,17 @@ process_physics_priority = 100
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
 script = ExtResource("4_bm2m2")
 ExitPortal = NodePath("../Portal3D2")
+RigidbodyBoost = 1.5
+TeleportInteractions = 7
 PortalThickness = 0.05
 PortalMeshPath = NodePath("Portal3D_Mesh")
 TeleportAreaPath = NodePath("TeleportArea")
 TeleportColliderPath = NodePath("TeleportArea/TeleportCollider")
 PropertyStatusList = Dictionary[String, bool]({
-"ExitPortal": true
+"ExitPortal": true,
+"IsTeleport": true,
+"RigidbodyBoost": true,
+"TeleportInteractions": true
 })
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
 metadata/_edit_group_ = true
@@ -161,7 +166,7 @@ mesh = SubResource("ArrayMesh_2x3ts")
 [node name="TeleportArea" type="Area3D" parent="Portal3D"]
 
 [node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D/TeleportArea"]
-shape = SubResource("BoxShape3D_hdhqv")
+shape = SubResource("BoxShape3D_bm2m2")
 
 [node name="Portal3D2" type="Node3D" parent="." node_paths=PackedStringArray("ExitPortal") groups=["Portals"]]
 process_priority = 100
@@ -169,12 +174,17 @@ process_physics_priority = 100
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -17)
 script = ExtResource("4_bm2m2")
 ExitPortal = NodePath("../Portal3D")
+RigidbodyBoost = 1.5
+TeleportInteractions = 7
 PortalThickness = 0.05
 PortalMeshPath = NodePath("Portal3D2_Mesh")
 TeleportAreaPath = NodePath("TeleportArea")
 TeleportColliderPath = NodePath("TeleportArea/TeleportCollider")
 PropertyStatusList = Dictionary[String, bool]({
-"ExitPortal": true
+"ExitPortal": true,
+"IsTeleport": true,
+"RigidbodyBoost": true,
+"TeleportInteractions": true
 })
 metadata/_custom_type_script = "uid://sgo73u0y6rmi"
 metadata/_edit_group_ = true
@@ -189,4 +199,4 @@ mesh = SubResource("ArrayMesh_hy4wy")
 [node name="TeleportArea" type="Area3D" parent="Portal3D2"]
 
 [node name="TeleportCollider" type="CollisionShape3D" parent="Portal3D2/TeleportArea"]
-shape = SubResource("BoxShape3D_xdxme")
+shape = SubResource("BoxShape3D_daeaq")
