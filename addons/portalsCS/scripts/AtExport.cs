@@ -31,11 +31,10 @@ public partial class AtExport : GodotObject
 	{
 		Dictionary result = BaseExport(propname, (int)Godot.Variant.Type.Bool);
 
-		// if (groupEnable)
-		// {
-		// 	result["hint"] = PropertyHint.GroupEnable; //FIXME: ExportBool
-		// }
-
+		if (groupEnable)
+		{
+			result["hint"] = (int)PropertyHint.GroupEnable;
+		}
 		return result;
 	}
 
