@@ -1,10 +1,8 @@
 # Update Plans
 
 ## IMPORTANT:
-- [ ] Gizmos integration or rewrite.
 
 ## MODERATE:
-- [ ] FIXME: Double lookup in erase metadata
 - [ ] FIXME: "Pair portal" and "Match portal size" buttons are non-functional
 - [ ] TEST: All portal functionality needs testing after rewrite completion.
 
@@ -18,3 +16,4 @@
 - [x] Rewrite plugin into C#
 - [x] Issues and PRs from main repo.
 - [x] .NET Assebly Unloading Error
+- [x] Gizmos integration or rewrite.
