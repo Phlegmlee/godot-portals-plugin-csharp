@@ -136,7 +136,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_portalSize = value;
-			if (CausedByUserInteraction() && PortalMesh != null)
+			if (IsCausedByUserInteraction(nameof(PortalSize)) && PortalMesh != null)
 			{
 				OnPortalSizeChanged();
 				UpdateConfigurationWarnings();
@@ -156,10 +156,6 @@ public partial class Portal3D : Node3D
 			NotifyPropertyListChanged();
 		}
 	}
-
-	// FIXME: These callable lambdas are what is causing the .NET assembly failure, need a new button implementation. (Or none at all?)
-	// public Callable _TbPairPortals = Callable.From(() => MethodName.EditorPairPortals);
-	// public Callable _TbSyncPortalSizes = Callable.From(() => MethodName.EditorSyncPortalSizes);
 
 	[ExportGroup("Rendering")]
 	[Export] public Camera3D PlayerCamera;
@@ -211,7 +207,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_portalRenderLayer = value;
-			if (CausedByUserInteraction() && PortalMesh != null)
+			if (IsCausedByUserInteraction(nameof(PortalRenderLayer)) && PortalMesh != null)
 			{
 				PortalMesh.Layers = value;
 			}
@@ -226,7 +222,7 @@ public partial class Portal3D : Node3D
 		set
 		{
 			_isTeleport = value;
-			if (CausedByUserInteraction())
+			if (IsCausedByUserInteraction(nameof(IsTeleport)))
 			{
 				SetupTeleport();
 				NotifyPropertyListChanged();
@@ -295,13 +291,16 @@ public partial class Portal3D : Node3D
 	#region Internal
 
 	private float _portalThickness = 0.05f;
-	internal float PortalThickness
+	public float PortalThickness
 	{
 		get => _portalThickness;
 		set
 		{
 			_portalThickness = value;
-			if (CausedByUserInteraction() && PortalMesh != null) OnPortalSizeChanged();
+			if (IsCausedByUserInteraction(nameof(PortalThickness)) && PortalMesh != null)
+			{
+				OnPortalSizeChanged();
+			}
 		}
 	}
 
@@ -317,14 +316,10 @@ public partial class Portal3D : Node3D
 		{
 			return PortalMeshPath != null ? GetNode<MeshInstance3D>(PortalMeshPath) : null;
 		}
-		set
-		{
-			Debug.Assert(false, "Proxy variable, use 'PortalMeshPath' instead.");
-		}
 	}
 
 	private NodePath _teleportAreaPath;
-	internal NodePath TeleportAreaPath
+	public NodePath TeleportAreaPath
 	{
 		get => _teleportAreaPath;
 		set => _teleportAreaPath = value;
@@ -335,14 +330,10 @@ public partial class Portal3D : Node3D
 		{
 			return TeleportAreaPath != null ? GetNode<Area3D>(TeleportAreaPath) : null;
 		}
-		set
-		{
-			Debug.Assert(false, "Proxy variable, use 'TeleportAreaPath' instead.");
-		}
 	}
 
 	private NodePath _teleportColliderPath;
-	internal NodePath TeleportColliderPath
+	public NodePath TeleportColliderPath
 	{
 		get => _teleportColliderPath;
 		set => _teleportColliderPath = value;
@@ -352,10 +343,6 @@ public partial class Portal3D : Node3D
 		get
 		{
 			return TeleportColliderPath != null ? GetNode<CollisionShape3D>(TeleportColliderPath) : null;
-		}
-		set
-		{
-			Debug.Assert(false, "Proxy variable, use 'TeleportColliderPath' instead.");
 		}
 	}
 
@@ -373,12 +360,45 @@ public partial class Portal3D : Node3D
 
 	internal Godot.Collections.Dictionary<ulong, TeleportableMetadata> WatchlistTeleportables = [];
 
+	/// <summary>
+	/// <para>
+	/// Stores the status of properties that have been changed from default values.
+	/// </para>
+	/// <para>
+	/// This is per-portal so it protects property setters from overriding
+	/// changed values or calling setup methods on build.
+	/// </para>
+	/// </summary>
+	public Godot.Collections.Dictionary<string, bool> PropertyStatusList = [];
+
 	#endregion
 
 	#region Editor Configuration
 
 	private static readonly Shader PortalShader = GD.Load<Shader>("uid://csiava4euv75d");
 	private static readonly StandardMaterial3D EditorPreviewMaterial = GD.Load<StandardMaterial3D>("uid://suwscljyisas");
+
+	public override void _EnterTree()
+	{
+		if (Engine.IsEditorHint())
+		{
+			EditorInspector editorInspector = EditorInterface.Singleton.GetInspector();
+			editorInspector.PropertyEdited += OnPropertyEdited;
+		}
+
+		base._EnterTree();
+	}
+
+	public override void _ExitTree()
+	{
+		if (Engine.IsEditorHint() && IsNodeReady())
+		{
+			EditorInspector editorInspector = EditorInterface.Singleton.GetInspector();
+			editorInspector.PropertyEdited -= OnPropertyEdited;
+		}
+
+		base._ExitTree();
+	}
 
 	private void EditorReady()
 	{
@@ -440,12 +460,12 @@ public partial class Portal3D : Node3D
 
 		if (TeleportArea != null && TeleportCollider != null) return;
 
-		Area3D area = new() { Name = "TeleportArea" };
+		Area3D area = new() { Name = nameof(TeleportArea) };
 
 		AddChildInEditor(this, area);
 		TeleportAreaPath = GetPathTo(area);
 
-		CollisionShape3D collider = new() { Name = "TeleportCollider" };
+		CollisionShape3D collider = new() { Name = nameof(TeleportCollider) };
 		BoxShape3D box = new();
 		box.Size = box.Size with { X = PortalSize.X, Y = PortalSize.Y };
 		collider.Shape = box;
@@ -614,7 +634,6 @@ public partial class Portal3D : Node3D
 				Node3D teleportable = (Node3D)body.GetNode((string)teleportablePath);
 				teleportable.GlobalTransform = ToExitTransform(teleportable.GlobalTransform);
 
-				// FIXME: This might not work...it seems like it should but if object redirection/boosting isn't working this is most likley why.
 				if (teleportable is RigidBody3D rigidTeleportable)
 				{
 					rigidTeleportable.LinearVelocity = ToExitDirection(rigidTeleportable.LinearVelocity);
@@ -829,13 +848,7 @@ public partial class Portal3D : Node3D
 
 	private void EraseTpMetadata(ulong nodeId)
 	{
-		// FIXME: Double lookup here, this is preventing an error
-		//	where the lookup assignment 1 line below this is throws
-		//	a key not found exception...maybe the method is getting called
-		//	multiple times?
-		if (!WatchlistTeleportables.ContainsKey(nodeId)) return;
-
-		TeleportableMetadata metadata = WatchlistTeleportables[nodeId];
+		WatchlistTeleportables.TryGetValue(nodeId, out TeleportableMetadata metadata);
 		if (metadata != null)
 		{
 			if (metadata.IsPlayer) SetPortalPairUpdateMode(SubViewport.UpdateMode.WhenVisible);
@@ -956,9 +969,21 @@ public partial class Portal3D : Node3D
 		}
 	}
 
-	private bool CausedByUserInteraction()
+	private void OnPropertyEdited(string property)
 	{
-		return Engine.IsEditorHint() && IsNodeReady();
+		bool newProperty = PropertyStatusList.TryAdd(property, true);
+		if (!newProperty) PropertyStatusList[property] = true;
+	}
+	
+	private bool CheckPropertyEditedStatus(string property)
+	{
+		PropertyStatusList.TryGetValue(property, out bool value);
+		return value;
+	}
+
+	private bool IsCausedByUserInteraction(string property)
+	{
+		return Engine.IsEditorHint() && IsNodeReady() && CheckPropertyEditedStatus(property);
 	}
 
 	private void GroupNode(Node node)
@@ -1061,39 +1086,34 @@ public partial class Portal3D : Node3D
 	{
 		Array<Dictionary> config = [];
 		
-		// TODO: Implement these buttons in a different way?
-		// if (ExitPortal != null && !PortalSize.IsEqualApprox(ExitPortal.PortalSize))
-		// {
-		// 	config.Add(AtExport.ExportButton("_TbSyncPortalSizes", "Take Exit Portal's Size", "Vector2"));
-		// }
-
-		// if (ExitPortal != null && ExitPortal.ExitPortal == null)
-		// {
-		// 	config.Add(AtExport.ExportButton("_TbPairPortals", "Pair Portals", "SliderJoint3D"));
-		// }
-
 		config.Add(new Dictionary()
 		{
-			{"name", "PortalThickness"},
+			{"name", nameof(PortalThickness)},
 			{"type", (int)Variant.Type.Float},
 			{"usage", (int)PropertyUsageFlags.Storage}
 		});
 		config.Add(new Dictionary()
 		{
-			{"name", "PortalMeshPath"},
+			{"name", nameof(PortalMeshPath)},
 			{"type", (int)Variant.Type.NodePath},
 			{"usage", (int)PropertyUsageFlags.Storage}
 		});
 		config.Add(new Dictionary()
 		{
-			{"name", "TeleportAreaPath"},
+			{"name", nameof(TeleportAreaPath)},
 			{"type", (int)Variant.Type.NodePath},
 			{"usage", (int)PropertyUsageFlags.Storage}
 		});
 		config.Add(new Dictionary()
 		{
-			{"name", "TeleportColliderPath"},
+			{"name", nameof(TeleportColliderPath)},
 			{"type", (int)Variant.Type.NodePath},
+			{"usage", (int)PropertyUsageFlags.Storage}
+		});
+		config.Add(new Dictionary()
+		{
+			{"name", nameof(PropertyStatusList)},
+			{"type", (int)Variant.Type.Dictionary},
 			{"usage", (int)PropertyUsageFlags.Storage}
 		});
 
