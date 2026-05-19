@@ -8,9 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Gizmos UI integration.
 
-## [Unreleased] - YYYY-MM-DD
+## [0.8.4] - 2026-05-19
 ### Fixed
-- .NET Assembly Unloading Error
+- .NET Assembly Unloading Error [Issue #7]
+- Export property persistence problem [Issue #4 and #12]
 
 ## [0.8.3] - 2026-05-17
 ### Added
